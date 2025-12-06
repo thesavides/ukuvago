@@ -172,7 +172,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 // SeedAdminUser creates a default admin user if none exists
 func SeedAdminUser(cfg *config.Config, authService *services.AuthService) error {
 	// Check if admin exists
-	_, err := authService.Login(cfg.AdminEmail, "admin123")
+	_, _, err := authService.Login(cfg.AdminEmail, "admin123")
 	if err == nil {
 		return nil // Admin exists
 	}
