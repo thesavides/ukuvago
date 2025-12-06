@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UkuvaGo - Angel Investment Platform</title>
-    <meta name="description" content="Connect with innovative startups and angel investors. Browse curated projects, make investments, and grow together.">
+    <meta name="description"
+        content="Connect with innovative startups and angel investors. Browse curated projects, make investments, and grow together.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar">
@@ -37,7 +40,8 @@
         <section class="hero">
             <div class="hero-content">
                 <h1>Invest in the <span class="text-gradient">Future</span></h1>
-                <p>Discover innovative startup projects seeking angel investment. Browse curated opportunities, connect with founders, and make strategic investments with SAFE notes.</p>
+                <p>Discover innovative startup projects seeking angel investment. Browse curated opportunities, connect
+                    with founders, and make strategic investments with SAFE notes.</p>
                 <div class="hero-buttons">
                     <a href="#register" class="btn btn-primary btn-lg">Start Investing</a>
                     <a href="#projects" class="btn btn-secondary btn-lg">Browse Projects</a>
@@ -47,10 +51,22 @@
 
         <section class="section container">
             <div class="stats">
-                <div class="card stat-card"><div class="stat-value">50+</div><div class="stat-label">Startup Projects</div></div>
-                <div class="card stat-card"><div class="stat-value">$2M+</div><div class="stat-label">Total Invested</div></div>
-                <div class="card stat-card"><div class="stat-value">200+</div><div class="stat-label">Angel Investors</div></div>
-                <div class="card stat-card"><div class="stat-value">85%</div><div class="stat-label">Success Rate</div></div>
+                <div class="card stat-card">
+                    <div class="stat-value">50+</div>
+                    <div class="stat-label">Startup Projects</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value">$2M+</div>
+                    <div class="stat-label">Total Invested</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value">200+</div>
+                    <div class="stat-label">Angel Investors</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
             </div>
         </section>
 
@@ -63,22 +79,26 @@
                 <div class="card feature-card">
                     <div class="feature-icon">📝</div>
                     <h3 class="feature-title">1. Register & Sign NDA</h3>
-                    <p class="feature-description">Create your investor account and sign our digital NDA to access confidential project information.</p>
+                    <p class="feature-description">Create your investor account and sign our digital NDA to access
+                        confidential project information.</p>
                 </div>
                 <div class="card feature-card">
                     <div class="feature-icon">💳</div>
                     <h3 class="feature-title">2. Pay Viewing Fee</h3>
-                    <p class="feature-description">One-time $500 fee grants access to view up to 4 complete project pitches and details.</p>
+                    <p class="feature-description">One-time $500 fee grants access to view up to 4 complete project
+                        pitches and details.</p>
                 </div>
                 <div class="card feature-card">
                     <div class="feature-icon">🔍</div>
                     <h3 class="feature-title">3. Explore Projects</h3>
-                    <p class="feature-description">Browse detailed business plans, financials, team info, and one-page investor pitches.</p>
+                    <p class="feature-description">Browse detailed business plans, financials, team info, and one-page
+                        investor pitches.</p>
                 </div>
                 <div class="card feature-card">
                     <div class="feature-icon">💰</div>
                     <h3 class="feature-title">4. Make an Offer</h3>
-                    <p class="feature-description">Submit your investment offer. If accepted, sign a SAFE note term sheet electronically.</p>
+                    <p class="feature-description">Submit your investment offer. If accepted, sign a SAFE note term
+                        sheet electronically.</p>
                 </div>
             </div>
         </section>
@@ -192,16 +212,6 @@
 
     <div id="toast-container" class="toast-container"></div>
     <script src="/static/js/app.js"></script>
-    <script>
-        // Page initializers
-        pages.home = () => {};
-        pages.projects = () => { loadCategories(); loadProjects(); };
-        pages.dashboard = () => {
-            if (!currentUser) { showPage('login'); return; }
-            if (currentUser.role === 'admin') window.location.hash = 'admin';
-            else if (currentUser.role === 'investor') window.location.hash = 'investor';
-            else window.location.hash = 'developer';
-        };
-    </script>
 </body>
+
 </html>

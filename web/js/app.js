@@ -121,6 +121,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
     updateNav();
 
+    // Page initializers
+    pages.home = () => { };
+    pages.projects = () => { loadCategories(); loadProjects(); };
+    pages.dashboard = () => {
+        if (!currentUser) { showPage('login'); return; }
+        if (currentUser.role === 'admin') window.location.hash = 'admin';
+        else if (currentUser.role === 'investor') window.location.hash = 'investor';
+        else window.location.hash = 'developer';
+    };
+
     // Handle hash navigation
     const hash = window.location.hash.slice(1) || 'home';
     showPage(hash);
