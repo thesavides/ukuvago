@@ -3,10 +3,10 @@ package database
 import (
 	"log"
 
+	"github.com/glebarez/sqlite"
 	"github.com/ukuvago/angel-platform/internal/config"
 	"github.com/ukuvago/angel-platform/internal/models"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

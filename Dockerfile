@@ -3,25 +3,22 @@ FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache gcc musl-dev
-
-# Copy source code first
+# Copy source code
 COPY . .
 
 # Generate go.sum and download dependencies
 RUN go mod tidy
 
-# Build the application
-RUN CGO_ENABLED=1 GOOS=linux go build -o server ./cmd/server
+# Build the application (CGO disabled for simpler build)
+RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server
 
 # Runtime stage
 FROM alpine:latest
 
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apk add --no-cache ca-certificates libc6-compat
+# Install ca-certificates for HTTPS
+RUN apk add --no-cache ca-certificates
 
 # Copy binary from builder
 COPY --from=builder /app/server .
