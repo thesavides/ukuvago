@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UkuvaGo - Angel Investment Platform</title>
+    <meta name="description" content="Connect with innovative startups and angel investors. Browse curated projects, make investments, and grow together.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#home" class="navbar-brand">🚀 <span>UkuvaGo</span></a>
+            <ul class="navbar-nav">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <div id="auth-nav">
+                    <a href="#login" class="btn btn-secondary btn-sm">Login</a>
+                    <a href="#register" class="btn btn-primary btn-sm">Get Started</a>
+                </div>
+                <div id="user-nav" class="hidden flex items-center gap-md">
+                    <span>Hi, <strong id="user-name"></strong></span>
+                    <a href="#dashboard" class="btn btn-secondary btn-sm">Dashboard</a>
+                    <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div data-page="home">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Invest in the <span class="text-gradient">Future</span></h1>
+                <p>Discover innovative startup projects seeking angel investment. Browse curated opportunities, connect with founders, and make strategic investments with SAFE notes.</p>
+                <div class="hero-buttons">
+                    <a href="#register" class="btn btn-primary btn-lg">Start Investing</a>
+                    <a href="#projects" class="btn btn-secondary btn-lg">Browse Projects</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section container">
+            <div class="stats">
+                <div class="card stat-card"><div class="stat-value">50+</div><div class="stat-label">Startup Projects</div></div>
+                <div class="card stat-card"><div class="stat-value">$2M+</div><div class="stat-label">Total Invested</div></div>
+                <div class="card stat-card"><div class="stat-value">200+</div><div class="stat-label">Angel Investors</div></div>
+                <div class="card stat-card"><div class="stat-value">85%</div><div class="stat-label">Success Rate</div></div>
+            </div>
+        </section>
+
+        <section class="section container" id="how-it-works">
+            <div class="section-header">
+                <h2 class="section-title">How It <span class="text-gradient">Works</span></h2>
+                <p class="section-subtitle">Simple steps to start your investment journey</p>
+            </div>
+            <div class="features-grid">
+                <div class="card feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3 class="feature-title">1. Register & Sign NDA</h3>
+                    <p class="feature-description">Create your investor account and sign our digital NDA to access confidential project information.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3 class="feature-title">2. Pay Viewing Fee</h3>
+                    <p class="feature-description">One-time $500 fee grants access to view up to 4 complete project pitches and details.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">3. Explore Projects</h3>
+                    <p class="feature-description">Browse detailed business plans, financials, team info, and one-page investor pitches.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">4. Make an Offer</h3>
+                    <p class="feature-description">Submit your investment offer. If accepted, sign a SAFE note term sheet electronically.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Projects Page -->
+    <div data-page="projects" class="hidden" style="padding-top:100px">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Browse <span class="text-gradient">Projects</span></h2>
+                <p class="section-subtitle">Discover innovative startups seeking angel investment</p>
+            </div>
+            <div id="categories" class="flex gap-sm mb-lg" style="flex-wrap:wrap"></div>
+            <div id="projects-grid" class="project-grid"></div>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div data-page="login" class="hidden" style="padding-top:120px">
+        <div class="container" style="max-width:480px">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2>Welcome Back</h2>
+                    <p class="text-secondary">Sign in to your account</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Sign In</button>
+                </form>
+                <p class="text-center mt-lg text-secondary">Don't have an account? <a href="#register">Register</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div data-page="register" class="hidden" style="padding-top:100px">
+        <div class="container" style="max-width:560px">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2>Create Account</h2>
+                    <p class="text-secondary">Join UkuvaGo as an investor or developer</p>
+                </div>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label class="form-label">I am a...</label>
+                        <select name="role" class="form-control" required>
+                            <option value="investor">Angel Investor</option>
+                            <option value="developer">Startup Developer</option>
+                        </select>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" minlength="8" required>
+                        <span class="form-hint">Minimum 8 characters</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Company Name (Optional)</label>
+                        <input type="text" name="company_name" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Create Account</button>
+                </form>
+                <p class="text-center mt-lg text-secondary">Already have an account? <a href="#login">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard (redirects based on role) -->
+    <div data-page="dashboard" class="hidden dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Dashboard</h1>
+                <p class="dashboard-subtitle">Welcome back! Redirecting to your dashboard...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>© 2024 UkuvaGo. All rights reserved.</div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        // Page initializers
+        pages.home = () => {};
+        pages.projects = () => { loadCategories(); loadProjects(); };
+        pages.dashboard = () => {
+            if (!currentUser) { showPage('login'); return; }
+            if (currentUser.role === 'admin') window.location.hash = 'admin';
+            else if (currentUser.role === 'investor') window.location.hash = 'investor';
+            else window.location.hash = 'developer';
+        };
+    </script>
+</body>
+</html>
