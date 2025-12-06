@@ -25,7 +25,7 @@ type EmailData struct {
 	UserName    string
 	UserEmail   string
 	Subject     string
-	Content     string
+	Content     template.HTML
 	ActionURL   string
 	ActionLabel string
 }
