@@ -228,6 +228,18 @@ func (s *AuthService) GetUserByID(id uuid.UUID) (*models.User, error) {
 	return &user, nil
 }
 
+// GetUserByEmail retrieves a user by their email
+func (s *AuthService) GetUserByEmail(email string) (*models.User, error) {
+	db := database.GetDB()
+
+	var user models.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 // UpdateUser updates user profile information
 func (s *AuthService) UpdateUser(user *models.User) error {
 	db := database.GetDB()

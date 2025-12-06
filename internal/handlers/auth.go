@@ -148,7 +148,7 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	}
 
 	if token != "" {
-		user, _ := h.authService.GetUserByID(middleware.GetUserID(c))
+		user, _ := h.authService.GetUserByEmail(req.Email)
 		if user != nil {
 			go h.emailService.SendPasswordResetEmail(user, token)
 		}
