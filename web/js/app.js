@@ -117,11 +117,9 @@ function formatCurrency(amount, currency = 'usd') {
 }
 
 // Initialize app
+// Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
-    await checkAuth();
-    updateNav();
-
-    // Page initializers
+    // Page initializers - Define these first so they are ready
     pages.home = () => { };
     pages.projects = () => { loadCategories(); loadProjects(); };
     pages.dashboard = () => {
@@ -131,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else window.location.hash = 'developer';
     };
 
-    // Handle hash navigation
+    // Initialize navigation immediately
     const hash = window.location.hash.slice(1) || 'home';
     showPage(hash);
 
@@ -139,6 +137,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hash = window.location.hash.slice(1) || 'home';
         showPage(hash);
     });
+
+    // Check auth in background
+    await checkAuth();
+    updateNav();
+
+    // Refresh current page if needed after auth
+    if (currentUser && ['login', 'register'].includes(hash)) {
+        showPage('dashboard');
+    } else {
+        // Re-run page initializer in case it depends on auth (like dashboard)
+        if (pages[hash]) pages[hash]();
+    }
 });
 
 // Form handlers
