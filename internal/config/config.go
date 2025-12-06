@@ -46,8 +46,8 @@ type Config struct {
 
 func Load() *Config {
 	return &Config{
-		// Server
-		ServerPort: getEnv("SERVER_PORT", "8080"),
+		// Server (Railway uses PORT)
+		ServerPort: getEnvWithFallback("PORT", "SERVER_PORT", "8080"),
 		ServerHost: getEnv("SERVER_HOST", "0.0.0.0"),
 
 		// Database
@@ -106,6 +106,17 @@ func getEnvInt64(key string, defaultValue int64) int64 {
 		if intVal, err := strconv.ParseInt(value, 10, 64); err == nil {
 			return intVal
 		}
+	}
+	return defaultValue
+}
+
+// getEnvWithFallback checks primary key first, then fallback, then default
+func getEnvWithFallback(primary, fallback, defaultValue string) string {
+	if value := os.Getenv(primary); value != "" {
+		return value
+	}
+	if value := os.Getenv(fallback); value != "" {
+		return value
 	}
 	return defaultValue
 }
