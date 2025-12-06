@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -89,21 +90,15 @@ func (p *Payment) ToResponse() PaymentResponse {
 
 func formatCurrency(amount int64, currency string) string {
 	major := float64(amount) / 100
+	formatted := fmt.Sprintf("%.2f", major)
 	switch currency {
 	case "zar":
-		return "R" + formatFloat(major)
+		return "R" + formatted
 	case "eur":
-		return "€" + formatFloat(major)
+		return "€" + formatted
 	case "gbp":
-		return "£" + formatFloat(major)
+		return "£" + formatted
 	default:
-		return "$" + formatFloat(major)
+		return "$" + formatted
 	}
-}
-
-func formatFloat(f float64) string {
-	if f == float64(int64(f)) {
-		return string(rune(int64(f)))
-	}
-	return ""
 }
