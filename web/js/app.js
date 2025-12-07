@@ -91,10 +91,12 @@ function updateNav() {
     const userNav = document.getElementById('user-nav');
 
     if (currentUser) {
-        authNav?.classList.add('hidden');
-        userNav?.classList.remove('hidden');
-        document.getElementById('user-name')?.textContent = currentUser.first_name;
-        document.getElementById('user-role')?.textContent = currentUser.role;
+        if (authNav) authNav.classList.add('hidden');
+        if (userNav) userNav.classList.remove('hidden');
+        const nameEl = document.getElementById('user-name');
+        if (nameEl) nameEl.textContent = currentUser.first_name;
+        const roleEl = document.getElementById('user-role');
+        if (roleEl) roleEl.textContent = currentUser.role;
     } else {
         authNav?.classList.remove('hidden');
         userNav?.classList.add('hidden');
