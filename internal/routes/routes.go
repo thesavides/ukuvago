@@ -1,9 +1,14 @@
 package routes
 
 import (
+	"net/http"
+	"os"
+	"path/filepath"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/ukuvago/angel-platform/internal/config"
+	"github.com/ukuvago/angel-platform/internal/database"
 	"github.com/ukuvago/angel-platform/internal/handlers"
 	"github.com/ukuvago/angel-platform/internal/middleware"
 	"github.com/ukuvago/angel-platform/internal/models"
@@ -15,16 +20,22 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 
 	// CORS configuration
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
+		AllowOriginFunc:  func(origin string) bool { return true },
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
 
-	// Serve static files
-	router.Static("/uploads", cfg.UploadDir)
-	router.Static("/static", "./web")
+	// Health check for Cloud Run
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
+
+	// Serve static files with absolute paths to prevent fallback issues
+	wd, _ := os.Getwd()
+	router.Static("/uploads", filepath.Join(wd, cfg.UploadDir))
+	router.Static("/static", filepath.Join(wd, "web"))
 
 	// Initialize services
 	authService := services.NewAuthService(cfg)
@@ -44,6 +55,18 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 
 	// API routes
 	api := router.Group("/api")
+
+	// Middleware to check Database Readiness
+	api.Use(func(c *gin.Context) {
+		if database.GetDB() == nil {
+			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{
+				"error": "Service initializing, please try again shortly",
+			})
+			return
+		}
+		c.Next()
+	})
+
 	{
 		// Auth routes (public)
 		auth := api.Group("/auth")

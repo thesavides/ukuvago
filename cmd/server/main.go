@@ -21,8 +21,7 @@ func main() {
 	go func() {
 		log.Println("Background: Initializing database connection...")
 		if err := database.Initialize(cfg); err != nil {
-			log.Printf("CRITICAL: Failed to initialize database: %v", err)
-			return
+			log.Fatalf("CRITICAL: Failed to initialize database: %v", err)
 		}
 		log.Println("Background: Database initialized successfully.")
 
