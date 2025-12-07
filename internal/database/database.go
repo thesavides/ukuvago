@@ -63,29 +63,35 @@ func autoMigrate() error {
 
 func seedData() error {
 	// Seed categories if empty
+	return SeedCategories()
+}
+
+// SeedCategories populates the database with default categories if empty
+func SeedCategories() error {
 	var count int64
 	DB.Model(&models.Category{}).Count(&count)
-	if count == 0 {
-		categories := []models.Category{
-			{Name: "FinTech", Description: "Financial technology and banking innovations", Icon: "💰"},
-			{Name: "HealthTech", Description: "Healthcare and medical technology", Icon: "🏥"},
-			{Name: "EdTech", Description: "Education technology and e-learning", Icon: "📚"},
-			{Name: "AgriTech", Description: "Agricultural technology and farming innovations", Icon: "🌾"},
-			{Name: "CleanTech", Description: "Environmental and sustainability solutions", Icon: "🌱"},
-			{Name: "PropTech", Description: "Real estate and property technology", Icon: "🏠"},
-			{Name: "E-Commerce", Description: "Online retail and marketplace solutions", Icon: "🛒"},
-			{Name: "SaaS", Description: "Software as a Service platforms", Icon: "☁️"},
-			{Name: "AI/ML", Description: "Artificial intelligence and machine learning", Icon: "🤖"},
-			{Name: "IoT", Description: "Internet of Things and connected devices", Icon: "📡"},
-			{Name: "Cybersecurity", Description: "Security and data protection", Icon: "🔒"},
-			{Name: "Logistics", Description: "Supply chain and delivery solutions", Icon: "🚚"},
-		}
-		for _, cat := range categories {
-			DB.Create(&cat)
-		}
-		log.Println("Seeded categories")
+	if count > 0 {
+		return nil
 	}
 
+	categories := []models.Category{
+		{Name: "FinTech", Icon: "💳", Description: "Financial technology and services"},
+		{Name: "HealthTech", Icon: "🏥", Description: "Healthcare and medical technology"},
+		{Name: "SaaS / AI", Icon: "🚀", Description: "Software as a Service and Artificial Intelligence"},
+		{Name: "E-Commerce", Icon: "🛒", Description: "Online retail and marketplaces"},
+		{Name: "CleanTech", Icon: "🌍", Description: "Renewable energy and sustainability"},
+		{Name: "EdTech", Icon: "🎓", Description: "Education technology"},
+		{Name: "AgriTech", Icon: "🌾", Description: "Agricultural technology"},
+		{Name: "Logistics", Icon: "🚚", Description: "Supply chain and logistics"},
+		{Name: "PropTech", Icon: "🏠", Description: "Real estate technology"},
+	}
+
+	for _, c := range categories {
+		if err := DB.Create(&c).Error; err != nil {
+			return err
+		}
+	}
+	log.Println("Seeded categories")
 	return nil
 }
 

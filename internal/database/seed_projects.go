@@ -7,8 +7,8 @@ import (
 	"github.com/ukuvago/angel-platform/internal/models"
 )
 
-// SeedSampleProjects creates sample startup projects for demonstration
-func SeedSampleProjects() error {
+// SeedProjects creates sample startup projects for demonstration
+func SeedProjects() error {
 	var count int64
 	DB.Model(&models.Project{}).Count(&count)
 	if count > 0 {
