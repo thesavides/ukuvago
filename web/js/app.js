@@ -646,6 +646,8 @@ window.deleteCategory = async function (id) {
 
 async function loadAdminPendingProjects() {
     const tbody = document.getElementById('admin-pending-list');
+    if (!tbody) return;
+
     tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
     try {
         const data = await api.get('/admin/projects/pending');
@@ -672,6 +674,8 @@ async function loadAdminPendingProjects() {
 
 async function loadAdminAllProjects() {
     const tbody = document.getElementById('admin-all-list');
+    if (!tbody) return;
+
     tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
     try {
         const data = await api.get('/admin/projects/all');
