@@ -360,7 +360,12 @@ func (h *ProjectHandler) UpdateProject(c *gin.Context) {
 	project.TargetMarket = req.TargetMarket
 	project.BusinessModel = req.BusinessModel
 	project.Traction = req.Traction
-	project.Team = req.Team
+	// project.Team removed, need to update TeamMembers if we support team updates.
+	// For now, removing the broken assignment to fix build.
+	// Team update requires replacing TeamMembers relation.
+	// It's out of scope for "compilation fix" but critical for functionality.
+	// Leaving it out for now to ensure compile.
+
 	// Note: UpdateProject doesn't currently support file uploads or new fields in this snippet
 	// Let's add the basic fields first. Ideally UpdateProject should also support Multipart.
 	// For now adding WebsiteURL to JSON update.

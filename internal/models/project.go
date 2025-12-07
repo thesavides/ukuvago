@@ -49,7 +49,6 @@ type Project struct {
 	TargetMarket  string    `gorm:"type:text" json:"target_market"`
 	BusinessModel string    `gorm:"type:text" json:"business_model"`
 	Traction      string    `gorm:"type:text" json:"traction"`
-	Traction      string    `gorm:"type:text" json:"traction"`
 	// Team and TeamProfileURL replaced by TeamMembers relation
 	ContactEmail    string         `gorm:"size:255" json:"contact_email"`
 	ContactPhone    string         `gorm:"size:50" json:"contact_phone"`
