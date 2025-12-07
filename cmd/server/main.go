@@ -11,12 +11,20 @@ import (
 )
 
 func main() {
+	log.Println("Starting application...")
+
 	// Load configuration
 	cfg := config.Load()
+	log.Printf("Config loaded. Database Type: %s", cfg.DatabaseType)
 
 	// Initialize database
+	log.Println("Initializing database connection...")
 	if err := database.Initialize(cfg); err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+		log.Printf("CRITICAL: Failed to initialize database: %v", err)
+		log.Println("Server will start but will likely fail requests depending on DB.")
+		// We deliberately don't Fatalf here so the logs have time to flush and container acts alive long enough to see.
+	} else {
+		log.Println("Database initialized successfully.")
 	}
 
 	// Create upload directory
@@ -33,6 +41,7 @@ func main() {
 	}
 
 	// Setup router
+	log.Println("Setting up router...")
 	router := routes.SetupRouter(cfg)
 
 	// Start server
