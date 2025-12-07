@@ -190,6 +190,9 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 
 	// Serve frontend for all other routes
 	router.NoRoute(func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
 		c.File(filepath.Join(wd, "web/index.html"))
 	})
 
