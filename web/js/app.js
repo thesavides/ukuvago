@@ -43,12 +43,16 @@ async function register(userData) {
     return data;
 }
 
-function logout() {
+function clearAuth() {
     authToken = null;
     currentUser = null;
     localStorage.removeItem('token');
-    showPage('home');
     updateNav();
+}
+
+function logout() {
+    clearAuth();
+    showPage('home');
 }
 
 async function checkAuth() {
@@ -58,8 +62,8 @@ async function checkAuth() {
         currentUser = data.user;
         return currentUser;
     } catch {
-        logout();
-        return null;
+        clearAuth();
+        return null; // Don't redirect here, just clear state
     }
 }
 
@@ -101,13 +105,47 @@ function updateNav() {
 const pages = {};
 
 function showPage(pageName, params = {}) {
-    document.querySelectorAll('[data-page]').forEach(p => p.classList.add('hidden'));
-    const page = document.querySelector(`[data-page="${pageName}"]`);
-    if (page) {
-        page.classList.remove('hidden');
-        if (pages[pageName]) pages[pageName](params);
+    // Try to find a direct page match
+    let page = document.querySelector(`[data-page="${pageName}"]`);
+    let scrollTarget = null;
+
+    // If no direct page match, check if it's an element ID (like a section anchor)
+    if (!page) {
+        const element = document.getElementById(pageName);
+        if (element) {
+            // Find the parent page for this element
+            page = element.closest('[data-page]');
+            if (page) {
+                scrollTarget = element;
+            }
+        }
     }
-    window.scrollTo(0, 0);
+
+    // Default to home if still no page found
+    if (!page) {
+        console.warn(`Page or section "${pageName}" not found. Defaulting to home.`);
+        page = document.querySelector('[data-page="home"]');
+        pageName = "home"; // normalizing
+    }
+
+    if (page) {
+        // Hide all pages
+        document.querySelectorAll('[data-page]').forEach(p => p.classList.add('hidden'));
+
+        // Show target page
+        page.classList.remove('hidden');
+
+        // Run initializer if it exists (use the dataset.page name in case we resolved from a child)
+        const resolvedPageName = page.dataset.page;
+        if (pages[resolvedPageName]) pages[resolvedPageName](params);
+
+        // Handle scrolling
+        if (scrollTarget) {
+            scrollTarget.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            window.scrollTo(0, 0);
+        }
+    }
 }
 
 // Format currency
@@ -117,9 +155,8 @@ function formatCurrency(amount, currency = 'usd') {
 }
 
 // Initialize app
-// Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
-    // Page initializers - Define these first so they are ready
+    // Page initializers
     pages.home = () => { };
     pages.projects = () => { loadCategories(); loadProjects(); };
     pages.dashboard = () => {
@@ -142,12 +179,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
     updateNav();
 
-    // Refresh current page if needed after auth
-    if (currentUser && ['login', 'register'].includes(hash)) {
+    // Refresh current page if needed after auth (e.g., if we were on a protected route)
+    // But don't redirect AWAY from login/register if we are just anonymous
+    // Use the *current* hash now, as it might have changed or we just want to ensure consistency
+    const currentHash = window.location.hash.slice(1) || 'home';
+
+    if (currentUser && ['login', 'register'].includes(currentHash)) {
         showPage('dashboard');
     } else {
-        // Re-run page initializer in case it depends on auth (like dashboard)
-        if (pages[hash]) pages[hash]();
+        // Just re-run logic for current page to ensure state is correct
+        // (e.g. if we refreshed on #how-it-works, we want to stay there)
+        // We already called showPage(hash) at start.
+        // Calling it again is safe and updates UI state if auth changed things.
+        // showPage(currentHash); 
     }
 });
 
