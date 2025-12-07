@@ -191,73 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!currentUser || currentUser.role !== 'developer') { showPage('login'); return; }
         loadDeveloperDashboard();
     };
-    // ... rest
-    // ...
-
-    // Profile Functions
-    window.switchProfileTab = function (tab) {
-        const detailsTab = document.getElementById('profile-details');
-        const securityTab = document.getElementById('profile-security');
-        const btnDetails = document.getElementById('tab-btn-details');
-        const btnSecurity = document.getElementById('tab-btn-security');
-
-        if (tab === 'details') {
-            detailsTab.classList.remove('hidden');
-            securityTab.classList.add('hidden');
-            btnDetails.classList.replace('btn-outline', 'btn-primary');
-            btnSecurity.classList.replace('btn-primary', 'btn-outline');
-        } else {
-            detailsTab.classList.add('hidden');
-            securityTab.classList.remove('hidden');
-            btnDetails.classList.replace('btn-primary', 'btn-outline');
-            btnSecurity.classList.replace('btn-outline', 'btn-primary');
-        }
-    }
-
-    function loadProfile() {
-        const form = document.getElementById('update-profile-form');
-        if (!form || !currentUser) return;
-        form.first_name.value = currentUser.first_name;
-        form.last_name.value = currentUser.last_name;
-        form.company_name.value = currentUser.company_name || '';
-        form.email.value = currentUser.email;
-    }
-
-    document.getElementById('update-profile-form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const data = {
-            first_name: e.target.first_name.value,
-            last_name: e.target.last_name.value,
-            company_name: e.target.company_name.value
-        };
-        try {
-            const res = await api.put('/auth/profile', data);
-            currentUser = res.user; // Update local user
-            updateNav(); // Reflect changes in nav
-            showToast('Profile updated', 'success');
-        } catch (err) {
-            showToast(err.message, 'error');
-        }
-    });
-
-    document.getElementById('change-password-form')?.addEventListener('submit', async (e) => {
-        // ... existing logic ...
-        e.preventDefault();
-        // ...
-        const form = e.target;
-        // ...
-        // ...
-        try {
-            await api.put('/auth/password', {
-                current_password: form.current_password.value,
-                new_password: form.new_password.value
-            });
-            showToast('Password updated successfully', 'success');
-            form.reset();
-        } catch (err) {
-            showToast(err.message, 'error');
-        }
-    });
     pages.admin = () => {
         if (!currentUser || currentUser.role !== 'admin') { showPage('login'); return; }
         loadAdminDashboard();
@@ -276,19 +209,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
     updateNav();
 
-    // Refresh current page if needed after auth (e.g., if we were on a protected route)
-    // But don't redirect AWAY from login/register if we are just anonymous
-    // Use the *current* hash now, as it might have changed or we just want to ensure consistency
     const currentHash = window.location.hash.slice(1) || 'home';
-
     if (currentUser && ['login', 'register'].includes(currentHash)) {
         showPage('dashboard');
+    }
+});
+
+// Profile Functions
+window.switchProfileTab = function (tab) {
+    const detailsTab = document.getElementById('profile-details');
+    const securityTab = document.getElementById('profile-security');
+    const btnDetails = document.getElementById('tab-btn-details');
+    const btnSecurity = document.getElementById('tab-btn-security');
+
+    if (!detailsTab || !securityTab) return;
+
+    if (tab === 'details') {
+        detailsTab.classList.remove('hidden');
+        securityTab.classList.add('hidden');
+        btnDetails?.classList.replace('btn-outline', 'btn-primary');
+        btnSecurity?.classList.replace('btn-primary', 'btn-outline');
     } else {
-        // Just re-run logic for current page to ensure state is correct
-        // (e.g. if we refreshed on #how-it-works, we want to stay there)
-        // We already called showPage(hash) at start.
-        // Calling it again is safe and updates UI state if auth changed things.
-        // showPage(currentHash); 
+        detailsTab.classList.add('hidden');
+        securityTab.classList.remove('hidden');
+        btnDetails?.classList.replace('btn-primary', 'btn-outline');
+        btnSecurity?.classList.replace('btn-outline', 'btn-primary');
+    }
+}
+
+function loadProfile() {
+    const form = document.getElementById('update-profile-form');
+    if (!form || !currentUser) return;
+    form.first_name.value = currentUser.first_name;
+    form.last_name.value = currentUser.last_name;
+    form.company_name.value = currentUser.company_name || '';
+    form.email.value = currentUser.email;
+}
+
+document.getElementById('update-profile-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+        first_name: e.target.first_name.value,
+        last_name: e.target.last_name.value,
+        company_name: e.target.company_name.value
+    };
+    try {
+        const res = await api.put('/auth/profile', data);
+        currentUser = res.user;
+        updateNav();
+        showToast('Profile updated', 'success');
+    } catch (err) {
+        showToast(err.message, 'error');
     }
 });
 
