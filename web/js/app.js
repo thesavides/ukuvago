@@ -167,6 +167,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (currentUser.role === 'investor') window.location.hash = 'investor';
         else window.location.hash = 'developer';
     };
+    pages.admin = () => {
+        if (!currentUser || currentUser.role !== 'admin') { showPage('login'); return; }
+        loadAdminDashboard();
+    };
 
     // Initialize navigation immediately
     const hash = window.location.hash.slice(1) || 'home';
@@ -266,6 +270,89 @@ async function viewProject(id) {
     }
     window.location.hash = `project/${id}`;
 }
+
+// Admin Dashboard Logic
+async function loadAdminDashboard() {
+    try {
+        const statsData = await api.get('/admin/stats');
+        const stats = statsData.stats;
+
+        document.getElementById('admin-total-users').textContent = stats.total_users;
+        document.getElementById('admin-pending-projects').textContent = stats.pending_projects;
+        document.getElementById('admin-total-invested').textContent = formatCurrency(stats.total_revenue || 0);
+
+        loadAdminPendingProjects();
+    } catch (err) {
+        showToast('Failed to load admin stats: ' + err.message, 'error');
+    }
+}
+
+async function loadAdminPendingProjects() {
+    const list = document.getElementById('admin-pending-list');
+    if (!list) return;
+
+    list.innerHTML = '<tr><td colspan="5" class="text-center">Loading...</td></tr>';
+
+    try {
+        const data = await api.get('/admin/projects/pending');
+
+        if (!data.projects?.length) {
+            list.innerHTML = '<tr><td colspan="5" class="text-center text-secondary">No pending projects</td></tr>';
+            return;
+        }
+
+        list.innerHTML = data.projects.map(p => `
+            <tr>
+                <td>
+                    <div style="font-weight:600">${p.title}</div>
+                    <div style="font-size:0.85em;color:#666">${p.tagline || ''}</div>
+                </td>
+                <td>
+                    <div>${p.developer?.first_name} ${p.developer?.last_name}</div>
+                    <div style="font-size:0.85em;color:#666">${p.developer?.email}</div>
+                </td>
+                <td>${p.category?.name || 'Uncategorized'}</td>
+                <td>${new Date(p.created_at).toLocaleDateString()}</td>
+                <td style="text-align:right">
+                    <button class="btn btn-sm btn-primary" style="background:#10b981;border-color:#10b981" onclick="approveProject('${p.id}')">Approve</button>
+                    <button class="btn btn-sm btn-secondary" onclick="rejectProject('${p.id}')">Reject</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        list.innerHTML = `<tr><td colspan="5" class="text-error">Error: ${err.message}</td></tr>`;
+    }
+}
+
+async function approveProject(id) {
+    if (!confirm('Are you sure you want to approve this project?')) return;
+    try {
+        await api.post(`/admin/projects/${id}/approve`, { approved: true, reason: '' });
+        showToast('Project approved successfully', 'success');
+        loadAdminDashboard(); // Refresh
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
+
+async function rejectProject(id) {
+    const reason = prompt('Please enter a reason for rejection:');
+    if (reason === null) return; // Cancelled
+    if (!reason.trim()) { alert('Reason is required'); return; }
+
+    try {
+        await api.post(`/admin/projects/${id}/approve`, { approved: false, reason: reason });
+        showToast('Project rejected', 'info');
+        loadAdminDashboard(); // Refresh
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
+
+// Expose admin functions
+window.loadAdminPendingProjects = loadAdminPendingProjects;
+window.approveProject = approveProject;
+window.rejectProject = rejectProject;
 
 // Load categories
 async function loadCategories() {

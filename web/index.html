@@ -196,6 +196,57 @@
         </div>
     </div>
 
+    <!-- Admin Dashboard -->
+    <div data-page="admin" class="hidden" style="padding-top:100px">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Admin <span class="text-gradient">Dashboard</span></h2>
+                <p class="section-subtitle">Manage platform activity and approve projects</p>
+            </div>
+
+            <div class="card mb-lg">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="admin-total-users">-</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="admin-pending-projects">-</div>
+                        <div class="stat-label">Pending Review</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="admin-total-invested">-</div>
+                        <div class="stat-label">Total Invested</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs mb-md">
+                <button class="btn btn-secondary" onclick="loadAdminPendingProjects()">Pending Projects</button>
+            </div>
+
+            <div class="card">
+                <h3>Projects Awaiting Approval</h3>
+                <div class="table-container">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left">Project</th>
+                                <th style="text-align:left">Developer</th>
+                                <th style="text-align:left">Category</th>
+                                <th style="text-align:left">Submitted</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-pending-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -211,23 +262,8 @@
     </footer>
 
     <div id="toast-container" class="toast-container"></div>
-    <script>
-        window.onerror = function (msg, url, line) {
-            alert("JS Error: " + msg + "\nLine: " + line);
-            // Also log to document body in case alert is blocked
-            var div = document.createElement("div");
-            div.style.color = "red";
-            div.style.background = "white";
-            div.style.padding = "20px";
-            div.style.position = "fixed";
-            div.style.top = "0";
-            div.style.left = "0";
-            div.style.zIndex = "9999";
-            div.innerText = "JS Error: " + msg + " at line " + line;
-            document.body.appendChild(div);
-        };
-    </script>
-    <script src="/static/js/app.js?v=5"></script>
+    <div id="toast-container" class="toast-container"></div>
+    <script src="/static/js/app.js?v=6"></script>
 </body>
 
 </html>
