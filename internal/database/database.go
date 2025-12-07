@@ -52,6 +52,7 @@ func autoMigrate() error {
 		&models.Category{},
 		&models.Project{},
 		&models.ProjectImage{},
+		&models.TeamMember{},
 		&models.NDA{},
 		&models.Payment{},
 		&models.ProjectView{},

@@ -216,6 +216,30 @@ func (s *AuthService) ResetPassword(token, newPassword string) error {
 	return db.Save(&user).Error
 }
 
+// ChangePassword changes the user's password
+func (s *AuthService) ChangePassword(userID uuid.UUID, currentPassword, newPassword string) error {
+	db := database.GetDB()
+
+	user, err := s.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	// Verify current password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(currentPassword)); err != nil {
+		return errors.New("incorrect current password")
+	}
+
+	// Hash new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user.PasswordHash = string(hashedPassword)
+	return db.Save(user).Error
+}
+
 // GetUserByID retrieves a user by their ID
 func (s *AuthService) GetUserByID(id uuid.UUID) (*models.User, error) {
 	db := database.GetDB()

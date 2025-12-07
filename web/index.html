@@ -140,6 +140,36 @@
         </div>
     </div>
 
+    </div>
+
+    <!-- Change Password Modal/Page -->
+    <div data-page="change-password" class="hidden" style="padding-top:100px">
+        <div class="container" style="max-width:500px">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2>Change Password</h2>
+                </div>
+                <form id="change-password-form">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" name="current_password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="new_password" class="form-control" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" name="confirm_password" class="form-control" required minlength="8">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Update Password</button>
+                    <button type="button" class="btn btn-secondary w-full mt-sm"
+                        onclick="history.back()">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Developer Dashboard -->
     <div data-page="developer" class="hidden" style="padding-top:100px">
         <div class="container">
@@ -215,17 +245,50 @@
                         </div>
                     </div>
 
-                    <!-- Team -->
-                    <h3 class="mb-md mt-lg">Team</h3>
-                    <div class="form-group">
-                        <label class="form-label">Team Members</label>
-                        <textarea name="team" class="form-control" rows="2"
-                            placeholder="List key team members..."></textarea>
+                    <!-- Contact Details -->
+                    <h3 class="mb-md mt-lg">Contact Details</h3>
+                    <div class="card p-md bg-secondary mb-md">
+                        <div class="grid grid-cols-2 gap-md">
+                            <div class="form-group">
+                                <label class="form-label">Contact Email (Project Lead)</label>
+                                <input type="email" name="contact_email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contact Phone</label>
+                                <input type="tel" name="contact_phone" class="form-control" placeholder="+1234567890"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-md">
+                            <div class="form-group">
+                                <label class="form-label">Project Website</label>
+                                <input type="url" name="website_url" class="form-control" placeholder="https://...">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">POC / Demo URL</label>
+                                <input type="url" name="poc_url" class="form-control" placeholder="https://...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Team Profile URL (LinkedIn/Website)</label>
-                        <input type="url" name="team_profile_url" class="form-control" placeholder="https://...">
+
+                    <!-- Team Members -->
+                    <h3 class="mb-md mt-lg">Team Members</h3>
+                    <div id="team-members-container" class="mb-md">
+                        <!-- Dynamic rows will look like this: -->
+                        <!--
+                        <div class="team-member-row card p-sm mb-sm relative">
+                            <div class="grid grid-cols-3 gap-sm">
+                                <input placeholder="Name" ...>
+                                <input placeholder="Role" ...>
+                                <input placeholder="LinkedIn" ...>
+                            </div>
+                            <label><input type="radio" name="lead_index" value="0"> Project Lead</label>
+                            <button type="button" class="btn-text text-error abs-top-right">Remove</button>
+                        </div>
+                        -->
                     </div>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="addTeamMemberRow()">+ Add Team
+                        Member</button>
 
                     <!-- Investment -->
                     <h3 class="mb-md mt-lg">Investment Terms</h3>
@@ -251,8 +314,8 @@
                     <!-- Media -->
                     <h3 class="mb-md mt-lg">Media & Documents</h3>
                     <div class="form-group">
-                        <label class="form-label">Project Image (Cover)</label>
-                        <input type="file" name="image" class="form-control" accept="image/*">
+                        <label class="form-label">Project Screenshots/Images (Max 5)</label>
+                        <input type="file" name="images" class="form-control" accept="image/*" multiple>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Pitch Deck (PDF)</label>

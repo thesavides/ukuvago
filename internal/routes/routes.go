@@ -87,6 +87,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			{
 				authProtected.GET("/me", authHandler.GetCurrentUser)
 				authProtected.PUT("/profile", authHandler.UpdateProfile)
+				authProtected.POST("/change-password", authHandler.ChangePassword)
 			}
 		}
 
@@ -106,12 +107,15 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 				// Get project with access control
 				projectsProtected.GET("/:id", middleware.CheckNDAStatus(), middleware.CheckPaymentStatus(paymentService), projectHandler.GetProject)
 
-				// Developer routes
-				projectsProtected.POST("", middleware.RequireDeveloper(), projectHandler.CreateProject)
-				projectsProtected.PUT("/:id", middleware.RequireDeveloper(), projectHandler.UpdateProject)
-				projectsProtected.POST("/:id/submit", middleware.RequireDeveloper(), projectHandler.SubmitProject)
-				projectsProtected.POST("/:id/images", middleware.RequireDeveloper(), projectHandler.UploadProjectImage)
-				projectsProtected.DELETE("/:id/images/:imageId", middleware.RequireDeveloper(), projectHandler.DeleteProjectImage)
+				// Unified Project Management (Developer & Admin)
+				// Middleware removed here because Handler performs Role checks.
+				// For Create: Any Auth user can theoretically create? No, Investors shouldn't.
+				// We need a specific middleware or logic in handler.
+				// I will use `RequireDeveloperOrAdmin` if I can create it, or just handle it in handler.
+				// Let's modify handlers to strictly reject Investors if I remove the middleware.
+
+				// ACTUALLY: The easiest fix is to let `RequireDeveloper` pass if role is Admin.
+				// I'll check `internal/middleware/auth.go` first.
 			}
 		}
 

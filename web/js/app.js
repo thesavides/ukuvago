@@ -93,10 +93,18 @@ function updateNav() {
     if (currentUser) {
         if (authNav) authNav.classList.add('hidden');
         if (userNav) userNav.classList.remove('hidden');
-        const nameEl = document.getElementById('user-name');
-        if (nameEl) nameEl.textContent = currentUser.first_name;
-        const roleEl = document.getElementById('user-role');
-        if (roleEl) roleEl.textContent = currentUser.role;
+        document.getElementById('nav-auth').innerHTML = `
+        <div class="dropdown">
+            <button class="btn btn-secondary" onclick="toggleDropdown()">
+                ${currentUser.first_name} (${currentUser.role}) ▾
+            </button>
+            <div id="user-dropdown" class="dropdown-content hidden">
+                <a href="#dashboard">Dashboard</a>
+                <a href="#change-password">Change Password</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    `;
     } else {
         authNav?.classList.remove('hidden');
         userNav?.classList.add('hidden');
@@ -339,55 +347,104 @@ async function submitProjectForReview(id) {
 window.submitProjectForReview = submitProjectForReview;
 
 // Create Project Logic
+// Initial Load for Create Project
 async function loadCreateProject() {
     const select = document.getElementById('create-project-category');
-    if (!select || select.children.length > 0) return; // Already loaded
-
-    try {
-        const data = await api.get('/categories');
-        select.innerHTML = '<option value="">Select Category...</option>' +
-            data.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-    } catch (err) {
-        showToast('Failed to load categories', 'error');
+    if (select && select.children.length === 0) {
+        try {
+            const data = await api.get('/categories');
+            select.innerHTML = '<option value="">Select Category</option>' +
+                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        } catch (err) {
+            console.error(err);
+        }
     }
+    // Add one initial team member row if empty
+    const container = document.getElementById('team-members-container');
+    if (container && container.children.length === 0) {
+        addTeamMemberRow();
+    }
+}
+
+// Global function to add team member row
+window.addTeamMemberRow = function () {
+    const container = document.getElementById('team-members-container');
+    const index = container.children.length;
+    const div = document.createElement('div');
+    div.className = 'team-member-row card p-sm mb-sm relative bg-secondary';
+    div.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+            <input type="text" class="form-control tm-name" placeholder="Name" required>
+            <input type="text" class="form-control tm-role" placeholder="Role" required>
+            <input type="url" class="form-control tm-url" placeholder="LinkedIn URL">
+        </div>
+        <div class="mt-sm flex justify-between items-center">
+            <label class="flex items-center gap-sm cursor-pointer">
+                <input type="radio" name="lead_radio" value="${index}" ${index === 0 ? 'checked' : ''}>
+                <span class="text-sm">Project Lead</span>
+            </label>
+            ${index > 0 ? `<button type="button" class="text-error text-sm" onclick="this.closest('.team-member-row').remove()">Remove</button>` : ''}
+        </div>
+    `;
+    container.appendChild(div);
 }
 
 document.getElementById('create-project-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
+    const form = e.target;
+    const formData = new FormData(form);
+
+    // Collect Team Members
+    const members = [];
+    const rows = document.querySelectorAll('.team-member-row');
+    rows.forEach((row, idx) => {
+        const name = row.querySelector('.tm-name').value;
+        const role = row.querySelector('.tm-role').value;
+        const url = row.querySelector('.tm-url').value;
+        const isLead = row.querySelector(`input[name="lead_radio"][value="${idx}"]`)?.checked || false;
+        if (name && role) {
+            members.push({ name, role, profile_url: url, is_lead: isLead });
+        }
+    });
+
+    if (members.length === 0) {
+        showToast('Please add at least one team member', 'error');
+        return;
+    }
+
+    formData.append('team_members_json', JSON.stringify(members));
+
+    // Handle images file input - FormData(form) already includes it
+    // const imagesInput = form.querySelector('input[name="images"]');
+    // if (imagesInput && imagesInput.files.length > 0) {
+    //     for (let i = 0; i < imagesInput.files.length; i++) {
+    //         formData.append('images', imagesInput.files[i]);
+    //     }
+    // }
+
+    const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
     btn.textContent = 'Submitting...';
 
     try {
-        // Use FormData for file upload
-        const formData = new FormData(e.target);
+        'Authorization': `Bearer ${token}`
+        // Let browser set Content-Type for multipart
+    },
+    body: formData
+});
 
-        // Ensure numbers are numbers
-        // No manual JSON conversion needed, fetch sends FormData as multipart/form-data automatically
-        // But headers need to NOT have Content-Type: application/json
+const json = await res.json();
+if (!res.ok) throw new Error(json.error || 'Submission failed');
 
-        const token = localStorage.getItem('token');
-        const res = await fetch(API_BASE + '/projects', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-                // Let browser set Content-Type for multipart
-            },
-            body: formData
-        });
-
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error || 'Submission failed');
-
-        showToast('Project created successfully!', 'success');
-        e.target.reset();
-        window.location.hash = 'developer'; // Go to dashboard
+showToast('Project created successfully!', 'success');
+e.target.reset();
+window.location.hash = 'developer'; // Go to dashboard
     } catch (err) {
-        showToast(err.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Submit Project';
-    }
+    showToast(err.message, 'error');
+} finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit Project';
+}
 });
 
 // Admin Dashboard Logic

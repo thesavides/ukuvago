@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -149,26 +150,39 @@ func (h *ProjectHandler) GetCategories(c *gin.Context) {
 
 // CreateProjectRequest represents project creation input
 type CreateProjectRequest struct {
-	Title          string  `json:"title" form:"title" binding:"required"`
-	Tagline        string  `json:"tagline" form:"tagline"`
-	CategoryID     string  `json:"category_id" form:"category_id" binding:"required"`
-	Description    string  `json:"description" form:"description" binding:"required"`
-	PitchContent   string  `json:"pitch_content" form:"pitch_content"`
-	Problem        string  `json:"problem" form:"problem"`
-	Solution       string  `json:"solution" form:"solution"`
-	TargetMarket   string  `json:"target_market" form:"target_market"`
-	BusinessModel  string  `json:"business_model" form:"business_model"`
-	Traction       string  `json:"traction" form:"traction"`
-	Team           string  `json:"team" form:"team"`
-	TeamProfileURL string  `json:"team_profile_url" form:"team_profile_url"`
-	WebsiteURL     string  `json:"website_url" form:"website_url"`
-	MinInvestment  float64 `json:"min_investment" form:"min_investment" binding:"required"`
-	MaxInvestment  float64 `json:"max_investment" form:"max_investment"`
-	EquityOffered  float64 `json:"equity_offered" form:"equity_offered"`
-	ValuationCap   float64 `json:"valuation_cap" form:"valuation_cap"`
+	Title         string `json:"title" form:"title" binding:"required"`
+	Tagline       string `json:"tagline" form:"tagline"`
+	CategoryID    string `json:"category_id" form:"category_id" binding:"required"`
+	Description   string `json:"description" form:"description" binding:"required"`
+	PitchContent  string `json:"pitch_content" form:"pitch_content"`
+	Problem       string `json:"problem" form:"problem"`
+	Solution      string `json:"solution" form:"solution"`
+	TargetMarket  string `json:"target_market" form:"target_market"`
+	BusinessModel string `json:"business_model" form:"business_model"`
+	Traction      string `json:"traction" form:"traction"`
+
+	// Complex fields sent as JSON strings in multipart form
+	TeamMembersJSON string `json:"team_members_json" form:"team_members_json"`
+
+	ContactEmail string `json:"contact_email" form:"contact_email" binding:"required"`
+	ContactPhone string `json:"contact_phone" form:"contact_phone" binding:"required"`
+	WebsiteURL   string `json:"website_url" form:"website_url"`
+	POCUrl       string `json:"poc_url" form:"poc_url"`
+
+	MinInvestment float64 `json:"min_investment" form:"min_investment" binding:"required"`
+	MaxInvestment float64 `json:"max_investment" form:"max_investment"`
+	EquityOffered float64 `json:"equity_offered" form:"equity_offered"`
+	ValuationCap  float64 `json:"valuation_cap" form:"valuation_cap"`
 }
 
-// CreateProject creates a new project (developer only)
+// TeamMemberInput helps parsing JSON
+type TeamMemberInput struct {
+	Name       string `json:"name"`
+	Role       string `json:"role"`
+	ProfileURL string `json:"profile_url"`
+	IsLead     bool   `json:"is_lead"`
+}
+
 // CreateProject creates a new project (developer only)
 func (h *ProjectHandler) CreateProject(c *gin.Context) {
 	userID, exists := middleware.GetUserID(c)
@@ -191,6 +205,24 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 		return
 	}
 
+	// Parse Team Members
+	var teamMembers []models.TeamMember
+	if req.TeamMembersJSON != "" {
+		var inputs []TeamMemberInput
+		if err := json.Unmarshal([]byte(req.TeamMembersJSON), &inputs); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team members format"})
+			return
+		}
+		for _, input := range inputs {
+			teamMembers = append(teamMembers, models.TeamMember{
+				Name:       input.Name,
+				Role:       input.Role,
+				ProfileURL: input.ProfileURL,
+				IsLead:     input.IsLead,
+			})
+		}
+	}
+
 	projectID := uuid.New()
 	var pitchDeckPath string
 
@@ -207,27 +239,29 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 	}
 
 	project := &models.Project{
-		ID:             projectID,
-		DeveloperID:    userID,
-		CategoryID:     categoryID,
-		Title:          req.Title,
-		Tagline:        req.Tagline,
-		Description:    req.Description,
-		PitchContent:   req.PitchContent,
-		Problem:        req.Problem,
-		Solution:       req.Solution,
-		TargetMarket:   req.TargetMarket,
-		BusinessModel:  req.BusinessModel,
-		Traction:       req.Traction,
-		Team:           req.Team,
-		TeamProfileURL: req.TeamProfileURL,
-		WebsiteURL:     req.WebsiteURL,
-		PitchDeck:      pitchDeckPath,
-		MinInvestment:  req.MinInvestment,
-		MaxInvestment:  req.MaxInvestment,
-		EquityOffered:  req.EquityOffered,
-		ValuationCap:   req.ValuationCap,
-		Status:         models.ProjectStatusDraft,
+		ID:            projectID,
+		DeveloperID:   userID,
+		CategoryID:    categoryID,
+		Title:         req.Title,
+		Tagline:       req.Tagline,
+		Description:   req.Description,
+		PitchContent:  req.PitchContent,
+		Problem:       req.Problem,
+		Solution:      req.Solution,
+		TargetMarket:  req.TargetMarket,
+		BusinessModel: req.BusinessModel,
+		Traction:      req.Traction,
+		ContactEmail:  req.ContactEmail,
+		ContactPhone:  req.ContactPhone,
+		WebsiteURL:    req.WebsiteURL,
+		POCUrl:        req.POCUrl,
+		PitchDeck:     pitchDeckPath,
+		MinInvestment: req.MinInvestment,
+		MaxInvestment: req.MaxInvestment,
+		EquityOffered: req.EquityOffered,
+		ValuationCap:  req.ValuationCap,
+		Status:        models.ProjectStatusDraft,
+		TeamMembers:   teamMembers,
 	}
 
 	db := database.GetDB()
@@ -236,17 +270,25 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 		return
 	}
 
-	// Handle Image Upload (Optional)
-	imgFile, err := c.FormFile("image")
-	if err == nil {
-		path, name, err := h.storageService.SaveProjectImage(projectID, imgFile)
+	// Handle Multiple Images
+	form, _ := c.MultipartForm()
+	files := form.File["images"] // look for "images" key (multiple)
+	// Fallback to single "image" key if "images" is empty (backward compat)
+	if len(files) == 0 {
+		if f := form.File["image"]; len(f) > 0 {
+			files = f
+		}
+	}
+
+	for i, file := range files {
+		path, name, err := h.storageService.SaveProjectImage(projectID, file)
 		if err == nil {
 			image := &models.ProjectImage{
 				ProjectID:    projectID,
 				FilePath:     path,
 				FileName:     name,
-				IsPrimary:    true,
-				DisplayOrder: 0,
+				IsPrimary:    (i == 0), // First one is primary
+				DisplayOrder: i,
 			}
 			db.Create(image)
 		}

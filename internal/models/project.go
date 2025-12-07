@@ -37,21 +37,25 @@ const (
 )
 
 type Project struct {
-	ID              uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
-	DeveloperID     uuid.UUID      `gorm:"type:uuid;not null;index" json:"developer_id"`
-	CategoryID      uuid.UUID      `gorm:"type:uuid;not null;index" json:"category_id"`
-	Title           string         `gorm:"not null" json:"title"`
-	Tagline         string         `gorm:"size:200" json:"tagline"`
-	Description     string         `gorm:"type:text;not null" json:"description"`
-	PitchContent    string         `gorm:"type:text" json:"pitch_content"`
-	Problem         string         `gorm:"type:text" json:"problem"`
-	Solution        string         `gorm:"type:text" json:"solution"`
-	TargetMarket    string         `gorm:"type:text" json:"target_market"`
-	BusinessModel   string         `gorm:"type:text" json:"business_model"`
-	Traction        string         `gorm:"type:text" json:"traction"`
-	Team            string         `gorm:"type:text" json:"team"`
-	TeamProfileURL  string         `gorm:"size:255" json:"team_profile_url"` // LinkedIn or website
-	PitchDeck       string         `gorm:"size:255" json:"pitch_deck"`       // Path to PDF file
+	ID            uuid.UUID `gorm:"type:uuid;primary_key" json:"id"`
+	DeveloperID   uuid.UUID `gorm:"type:uuid;not null;index" json:"developer_id"`
+	CategoryID    uuid.UUID `gorm:"type:uuid;not null;index" json:"category_id"`
+	Title         string    `gorm:"not null" json:"title"`
+	Tagline       string    `gorm:"size:200" json:"tagline"`
+	Description   string    `gorm:"type:text;not null" json:"description"`
+	PitchContent  string    `gorm:"type:text" json:"pitch_content"`
+	Problem       string    `gorm:"type:text" json:"problem"`
+	Solution      string    `gorm:"type:text" json:"solution"`
+	TargetMarket  string    `gorm:"type:text" json:"target_market"`
+	BusinessModel string    `gorm:"type:text" json:"business_model"`
+	Traction      string    `gorm:"type:text" json:"traction"`
+	Traction      string    `gorm:"type:text" json:"traction"`
+	// Team and TeamProfileURL replaced by TeamMembers relation
+	ContactEmail    string         `gorm:"size:255" json:"contact_email"`
+	ContactPhone    string         `gorm:"size:50" json:"contact_phone"`
+	POCUrl          string         `gorm:"size:255" json:"poc_url"` // POC = Proof of Concept link? Or Point of Contact? Usually Proof of Concept in this context if distinct from Website. User said "link to the POC".
+	WebsiteURL      string         `gorm:"size:255" json:"website_url"`
+	PitchDeck       string         `gorm:"size:255" json:"pitch_deck"` // Path to PDF file
 	MinInvestment   float64        `gorm:"not null" json:"min_investment"`
 	MaxInvestment   float64        `json:"max_investment"`
 	EquityOffered   float64        `json:"equity_offered"` // percentage
@@ -66,11 +70,12 @@ type Project struct {
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relations
-	Developer *User             `gorm:"foreignKey:DeveloperID" json:"developer,omitempty"`
-	Category  *Category         `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
-	Images    []ProjectImage    `gorm:"foreignKey:ProjectID" json:"images,omitempty"`
-	Views     []ProjectView     `gorm:"foreignKey:ProjectID" json:"views,omitempty"`
-	Offers    []InvestmentOffer `gorm:"foreignKey:ProjectID" json:"offers,omitempty"`
+	Developer   *User             `gorm:"foreignKey:DeveloperID" json:"developer,omitempty"`
+	Category    *Category         `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Images      []ProjectImage    `gorm:"foreignKey:ProjectID" json:"images,omitempty"`
+	TeamMembers []TeamMember      `gorm:"foreignKey:ProjectID" json:"team_members,omitempty"`
+	Views       []ProjectView     `gorm:"foreignKey:ProjectID" json:"views,omitempty"`
+	Offers      []InvestmentOffer `gorm:"foreignKey:ProjectID" json:"offers,omitempty"`
 }
 
 func (p *Project) BeforeCreate(tx *gorm.DB) error {
