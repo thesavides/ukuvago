@@ -149,10 +149,8 @@ function showPage(pageName, params = {}) {
 
     // --- Start of new routing logic ---
 
-    // If the current hash already matches the target page, prevent re-routing unless it's a specific section
-    if (window.location.hash.slice(1) === resolvedPageName && !scrollTarget) {
-        // If we are already on the target page and not trying to scroll to a specific section, do nothing.
-        // This prevents infinite loops from hash changes that resolve to the same page.
+    // If the target page is already visible and we're not scrolling to a section, skip
+    if (!pageElement.classList.contains('hidden') && !scrollTarget) {
         return;
     }
 
