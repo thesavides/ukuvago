@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"database/sql"
+	"log"
 	"net/http"
 	"time"
 
@@ -40,27 +42,46 @@ func (h *AdminHandler) GetDashboardStats(c *gin.Context) {
 		TotalRevenue     int64 `json:"total_revenue"`
 	}
 
-	db.Model(&models.User{}).Count(&stats.TotalUsers)
+	// Use Find/Count individually and log errors
+	if err := db.Model(&models.User{}).Count(&stats.TotalUsers).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count users: " + err.Error()})
+		return
+	}
 	db.Model(&models.User{}).Where("role = ?", models.RoleInvestor).Count(&stats.TotalInvestors)
 	db.Model(&models.User{}).Where("role = ?", models.RoleDeveloper).Count(&stats.TotalDevelopers)
-	db.Model(&models.Project{}).Count(&stats.TotalProjects)
+
+	if err := db.Model(&models.Project{}).Count(&stats.TotalProjects).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count projects: " + err.Error()})
+		return
+	}
 	db.Model(&models.Project{}).Where("status = ?", models.ProjectStatusApproved).Count(&stats.ApprovedProjects)
 	db.Model(&models.Project{}).Where("status = ?", models.ProjectStatusPending).Count(&stats.PendingProjects)
+
 	db.Model(&models.InvestmentOffer{}).Count(&stats.TotalOffers)
 	db.Model(&models.InvestmentOffer{}).Where("status = ?", models.OfferStatusAccepted).Count(&stats.AcceptedOffers)
+
 	db.Model(&models.Payment{}).Where("status = ?", models.PaymentStatusCompleted).Count(&stats.TotalPayments)
 
-	// Calculate total revenue
-	var revenue struct {
-		Total int64
-	}
-	db.Model(&models.Payment{}).
+	// Calculate total revenue - Handle potential NULL/Error safely
+	var revenue sql.NullInt64
+	err := db.Model(&models.Payment{}).
 		Where("status = ?", models.PaymentStatusCompleted).
-		Select("COALESCE(SUM(amount), 0) as total").
-		Scan(&revenue)
-	stats.TotalRevenue = revenue.Total
+		Select("SUM(amount)").
+		Scan(&revenue).Error
 
-	c.JSON(http.StatusOK, gin.H{"stats": stats})
+	if err != nil {
+		// Log but don't fail, just return 0
+		log.Printf("Error calculating revenue: %v", err)
+		stats.TotalRevenue = 0
+	} else {
+		if revenue.Valid {
+			stats.TotalRevenue = revenue.Int64
+		} else {
+			stats.TotalRevenue = 0
+		}
+	}
+
+	c.JSON(http.StatusOK, stats)
 }
 
 // ListAllUsers returns all users with pagination
