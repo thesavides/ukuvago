@@ -12,7 +12,9 @@ import (
 )
 
 func main() {
-	log.Println("Starting application...")
+	log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	log.Println("!!! UkuvaGo SERVER STARTING - VERSION V5 (GIT SYNCED) !!!")
+	log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
 	// Load configuration
 	cfg := config.Load()
