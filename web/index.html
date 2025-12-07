@@ -15,7 +15,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="#home" class="navbar-brand">🚀 <span>UkuvaGo</span></a>
+            <a href="#home" class="navbar-brand">🚀 <span>AngelVault</span></a>
             <ul class="navbar-nav">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#projects">Projects</a></li>
@@ -37,68 +37,370 @@
 
     <!-- Home Page -->
     <div data-page="home">
-        <section class="hero">
+        <!-- Section 1: Hero -->
+        <section class="hero full-width">
             <div class="hero-content">
-                <h1>Invest in the <span class="text-gradient">Future</span></h1>
-                <p>Discover innovative startup projects seeking angel investment. Browse curated opportunities, connect
-                    with founders, and make strategic investments with SAFE notes.</p>
+                <h1>Where Serious Founders Meet <span class="text-gradient">Serious Angels</span></h1>
+                <h2>A curated marketplace for pre-seed investments. Vetted startups. Qualified investors. Streamlined
+                    term sheets.</h2>
+                <p>No tire-kickers. No time-wasters. Just committed founders and investors who understand that capital
+                    deserves diligence, and great ideas deserve serious capital.</p>
                 <div class="hero-buttons">
-                    <a href="#register" class="btn btn-primary btn-lg">Start Investing</a>
-                    <a href="#projects" class="btn btn-secondary btn-lg">Browse Projects</a>
+                    <a href="#register" onclick="setSignupType('developer')" class="btn btn-primary btn-lg">I'm Raising
+                        Capital</a>
+                    <a href="#register" onclick="setSignupType('investor')" class="btn btn-secondary btn-lg">I'm
+                        Investing</a>
                 </div>
+            </div>
+            <!-- Ideal place for split visual (Founder/Investor) as background or side image in CSS -->
+        </section>
+
+        <!-- Section 2: The Problem -->
+        <section class="section bg-dark text-white">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">The Traditional Angel Process Is <span class="text-error">Broken</span>
+                    </h2>
+                </div>
+                <div class="grid grid-cols-2 gap-xl">
+                    <div class="problem-col">
+                        <h3 class="text-danger mb-md">Founders' Pain</h3>
+                        <ul class="list-discomfort">
+                            <li>❌ Endless pitching to investors who ghost after 'I'll think about it'</li>
+                            <li>❌ Giving away IP before knowing if investors are serious</li>
+                            <li>❌ Months of back-and-forth for a $50k check</li>
+                            <li>❌ Navigating term sheets without legal support</li>
+                        </ul>
+                    </div>
+                    <div class="problem-col">
+                        <h3 class="text-danger mb-md">Investors' Pain</h3>
+                        <ul class="list-discomfort">
+                            <li>❌ Wading through unprepared founders with half-baked ideas</li>
+                            <li>❌ No way to filter signal from noise</li>
+                            <li>❌ Seeing the same pitch deck in three different formats</li>
+                            <li>❌ Complex negotiation processes that drag on</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="text-center mt-xl text-lg">AngelVault fixes this with one principle: <strong>commitment before
+                        engagement.</strong></p>
             </div>
         </section>
 
-        <section class="section container">
-            <div class="stats">
-                <div class="card stat-card">
-                    <div class="stat-value">50+</div>
-                    <div class="stat-label">Startup Projects</div>
-                </div>
-                <div class="card stat-card">
-                    <div class="stat-value">$2M+</div>
-                    <div class="stat-label">Total Invested</div>
-                </div>
-                <div class="card stat-card">
-                    <div class="stat-value">200+</div>
-                    <div class="stat-label">Angel Investors</div>
-                </div>
-                <div class="card stat-card">
-                    <div class="stat-value">85%</div>
-                    <div class="stat-label">Success Rate</div>
-                </div>
-            </div>
-        </section>
-
+        <!-- Section 3: How It Works (Split Screen) -->
         <section class="section container" id="how-it-works">
             <div class="section-header">
-                <h2 class="section-title">How It <span class="text-gradient">Works</span></h2>
-                <p class="section-subtitle">Simple steps to start your investment journey</p>
+                <h2 class="section-title">Built for Efficiency, Protected by <span class="text-gradient">Process</span>
+                </h2>
             </div>
-            <div class="features-grid">
-                <div class="card feature-card">
-                    <div class="feature-icon">📝</div>
-                    <h3 class="feature-title">1. Register & Sign NDA</h3>
-                    <p class="feature-description">Create your investor account and sign our digital NDA to access
-                        confidential project information.</p>
+            <div class="split-screen-grid">
+                <!-- Left: For Founders -->
+                <div class="split-col bg-glass p-lg radius-lg">
+                    <div class="badge badge-info mb-md">Raising Capital</div>
+                    <h3 class="mb-md">For Founders</h3>
+                    <ol class="process-list">
+                        <li>
+                            <strong>Submit Your Startup</strong>
+                            <p class="text-sm text-secondary">Upload pitch deck, financials, and metrics. Tell your
+                                story once, properly.</p>
+                        </li>
+                        <li>
+                            <strong>Admin Vetting</strong>
+                            <p class="text-sm text-secondary">We review for completeness, clarity, and market fit.</p>
+                        </li>
+                        <li>
+                            <strong>Go Live</strong>
+                            <p class="text-sm text-secondary">Approved projects appear in the marketplace. Only paid
+                                investors can view deep details.</p>
+                        </li>
+                        <li>
+                            <strong>Review Offers</strong>
+                            <p class="text-sm text-secondary">Receive clear investment offers. Negotiate directly.</p>
+                        </li>
+                        <li>
+                            <strong>Execute SAFE Notes</strong>
+                            <p class="text-sm text-secondary">Accept offer and execute standardized SAFE note. Legal
+                                handled.</p>
+                        </li>
+                    </ol>
+                    <a href="#register" onclick="setSignupType('developer')" class="btn btn-primary mt-md w-full">List
+                        Your Startup</a>
                 </div>
-                <div class="card feature-card">
-                    <div class="feature-icon">💳</div>
-                    <h3 class="feature-title">2. Pay Viewing Fee</h3>
-                    <p class="feature-description">One-time $500 fee grants access to view up to 4 complete project
-                        pitches and details.</p>
+
+                <!-- Right: For Investors -->
+                <div class="split-col bg-glass p-lg radius-lg">
+                    <div class="badge badge-success mb-md">Deploying Capital</div>
+                    <h3 class="mb-md">For Investors</h3>
+                    <ol class="process-list">
+                        <li>
+                            <strong>Browse Curated Opportunities</strong>
+                            <p class="text-sm text-secondary">Filter by category, stage, and sector. FinTech, SaaS,
+                                HealthTech, etc.</p>
+                        </li>
+                        <li>
+                            <strong>Pay to View</strong>
+                            <p class="text-sm text-secondary">$500 unlocks 4 detailed project evaluations. A commitment
+                                filter.</p>
+                        </li>
+                        <li>
+                            <strong>Sign NDAs & Review</strong>
+                            <p class="text-sm text-secondary">NDA required before viewing sensitive IP. Protects both
+                                sides.</p>
+                        </li>
+                        <li>
+                            <strong>Submit Offers</strong>
+                            <p class="text-sm text-secondary">Found a winner? Submit terms. Founders accept, counter, or
+                                discuss.</p>
+                        </li>
+                        <li>
+                            <strong>Execute SAFE Notes</strong>
+                            <p class="text-sm text-secondary">Standardized post-money SAFE notes. Valuation cap,
+                                discount handled.</p>
+                        </li>
+                    </ol>
+                    <a href="#register" onclick="setSignupType('investor')"
+                        class="btn btn-secondary mt-md w-full">Browse Opportunities</a>
                 </div>
-                <div class="card feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3 class="feature-title">3. Explore Projects</h3>
-                    <p class="feature-description">Browse detailed business plans, financials, team info, and one-page
-                        investor pitches.</p>
+            </div>
+        </section>
+
+        <!-- Section 4: Why AngelVault -->
+        <section class="section bg-secondary-subtle">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Why <span class="text-gradient">AngelVault</span></h2>
                 </div>
-                <div class="card feature-card">
-                    <div class="feature-icon">💰</div>
-                    <h3 class="feature-title">4. Make an Offer</h3>
-                    <p class="feature-description">Submit your investment offer. If accepted, sign a SAFE note term
-                        sheet electronically.</p>
+                <div class="features-grid">
+                    <div class="card feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3 class="feature-title">Commitment Signals</h3>
+                        <p class="feature-description">Investors pay to view. Founders undergo vetting. NDAs protect IP.
+                            Everyone proves they're serious before engagement.</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">Speed Meets Diligence</h3>
+                        <p class="feature-description">From first view to term sheet in weeks, not quarters. All
+                            materials in one place. Standardized SAFE notes.</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3 class="feature-title">African Market, Global Standards</h3>
+                        <p class="feature-description">Built by operators who understand African ecosystems.
+                            POPIA-compliant. International regulatory frameworks.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: For Founders (Deep Dive) -->
+        <section class="section container">
+            <div class="grid grid-cols-2 gap-xl items-center">
+                <div>
+                    <h2 class="mb-md">Your Startup Deserves Investors Who've Already <span
+                            class="text-gradient">Committed</span> to Looking</h2>
+                    <p class="text-lg mb-md">Stop pitching into the void. Start conversations with angels who've paid to
+                        be here.</p>
+                    <p class="text-secondary mb-md">
+                        Every founder knows the frustration: you send your deck, follow up, and hear nothing. AngelVault
+                        changes the dynamic.
+                        Before investors see your materials, they've:
+                    </p>
+                    <ul class="check-list mb-lg">
+                        <li>Registered with verified info</li>
+                        <li>Paid $500 for viewing access</li>
+                        <li>Agreed to NDA terms</li>
+                        <li>Demonstrated active deployment mode</li>
+                    </ul>
+                    <div class="flex gap-sm">
+                        <!-- Ideally a modal for demo, linking to projects for now -->
+                        <a href="#projects" class="btn btn-outline">See Example Listing</a>
+                        <a href="#register" onclick="setSignupType('developer')" class="btn btn-primary">Submit Your
+                            Startup</a>
+                    </div>
+                </div>
+                <div class="bg-glass p-lg radius-lg flex justify-center items-center">
+                    <!-- Placeholder for Project Listing Mockup -->
+                    <div class="text-center text-secondary">
+                        <div style="font-size:4rem; margin-bottom:1rem">📄</div>
+                        <p>Project Listing Mockup</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: For Investors (Deep Dive) -->
+        <section class="section bg-dark text-white">
+            <div class="container">
+                <div class="grid grid-cols-2 gap-xl items-center">
+                    <div class="order-2 md:order-1 bg-glass p-lg radius-lg">
+                        <!-- Category Breakdown Visual Placeholder -->
+                        <div class="text-center">
+                            <div style="font-size:4rem; margin-bottom:1rem">📊</div>
+                            <p>Category Breakdown Chart</p>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <h2 class="mb-md">Four Deep-Dives Per Fee. <br>No <span
+                                class="text-gradient">Spray-and-Pray</span>.</h2>
+                        <h3 class="h4 text-muted mb-md">The pay-to-view model forces focus.</h3>
+                        <p class="text-secondary mb-md">
+                            Browsing hundreds of startups leads to analysis paralysis. AngelVault enforces focus:
+                            <strong>$500 = 4 complete evaluations.</strong>
+                            <br><br>
+                            You choose carefully. Founders know you paid to see them.
+                        </p>
+                        <h4 class="mb-sm">What 'complete evaluation' means:</h4>
+                        <ul class="check-list mb-lg">
+                            <li>Full pitch deck (not a teaser)</li>
+                            <li>3-year financial projections</li>
+                            <li>Product demos & screenshots</li>
+                            <li>Founder background</li>
+                            <li>Clear investment terms & Cap Table</li>
+                            <li>Direct messaging</li>
+                        </ul>
+                        <div class="flex gap-sm">
+                            <a href="#projects" class="btn btn-primary">Browse Current Opportunities</a>
+                            <a href="#register" onclick="setSignupType('investor')" class="btn btn-secondary">Register
+                                as Investor</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Trust & Credibility -->
+        <section class="section container">
+            <div class="grid grid-cols-4 gap-md text-center">
+                <div class="p-md">
+                    <div class="text-xl mb-sm">⚖️</div>
+                    <h4>Regulatory Expertise</h4>
+                    <p class="text-sm text-secondary">Built by former MD of DNB-supervised entity.</p>
+                </div>
+                <div class="p-md">
+                    <div class="text-xl mb-sm">🔒</div>
+                    <h4>NDA Protection</h4>
+                    <p class="text-sm text-secondary">Signed NDA required before viewing.</p>
+                </div>
+                <div class="p-md">
+                    <div class="text-xl mb-sm">✅</div>
+                    <h4>Admin Vetting</h4>
+                    <p class="text-sm text-secondary">Every startup reviewed for quality.</p>
+                </div>
+                <div class="p-md">
+                    <div class="text-xl mb-sm">🇿🇦</div>
+                    <h4>POPIA Compliant</h4>
+                    <p class="text-sm text-secondary">Data protected under SA laws.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: SAFE Notes Explained -->
+        <section class="section bg-secondary-subtle">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">What's a <span class="text-gradient">SAFE Note</span>?</h2>
+                    <p class="section-subtitle">Simple Agreement for Future Equity</p>
+                </div>
+                <div class="card max-w-3xl mx-auto">
+                    <p class="mb-md">
+                        SAFE is an investment instrument developed by Y Combinator. It's not a loan—it's a contractual
+                        right to future equity when a priced round occurs.
+                    </p>
+                    <div class="grid grid-cols-3 gap-md mb-md">
+                        <div>
+                            <strong>Faster</strong>
+                            <p class="text-xs text-secondary">No immediate valuation negotiation.</p>
+                        </div>
+                        <div>
+                            <strong>Founder-Friendly</strong>
+                            <p class="text-xs text-secondary">No interest/repayment. Minimal dilution until priced
+                                round.</p>
+                        </div>
+                        <div>
+                            <strong>Investor-Friendly</strong>
+                            <p class="text-xs text-secondary">Valuation cap protection & discount on future rounds.</p>
+                        </div>
+                    </div>
+                    <hr class="border-glass mb-md">
+                    <h4 class="mb-sm">Key Terms:</h4>
+                    <ul class="list-disc pl-md text-sm text-secondary">
+                        <li><strong>Valuation Cap:</strong> Max company valuation at conversion.</li>
+                        <li><strong>Discount Rate:</strong> Percentage discount on future price (10-20%).</li>
+                        <li><strong>Post-Money:</strong> Calculated after investment.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 9 & 10: FAQs -->
+        <section class="section container">
+            <div class="section-header">
+                <h2 class="section-title">Frequently Asked <span class="text-gradient">Questions</span></h2>
+            </div>
+            <div class="grid grid-cols-2 gap-xl">
+                <!-- Founder FAQ -->
+                <div>
+                    <h3 class="mb-md">For Founders</h3>
+                    <div class="faq-item mb-md">
+                        <h4>Q: Cost to list?</h4>
+                        <p class="text-sm text-secondary">A: Nothing upfront. Success fee only if you raise.</p>
+                    </div>
+                    <div class="faq-item mb-md">
+                        <h4>Q: Vetting time?</h4>
+                        <p class="text-sm text-secondary">A: 3-5 business days.</p>
+                    </div>
+                    <div class="faq-item mb-md">
+                        <h4>Q: IP Protection?</h4>
+                        <p class="text-sm text-secondary">A: NDAs required for all investors before viewing sensitive
+                            info.</p>
+                    </div>
+                    <div class="faq-item mb-md">
+                        <h4>Q: Pre-revenue?</h4>
+                        <p class="text-sm text-secondary">A: Yes, if you have a prototype/MVP. Pure concepts typically
+                            not accepted.</p>
+                    </div>
+                </div>
+                <!-- Investor FAQ -->
+                <div>
+                    <h3 class="mb-md">For Investors</h3>
+                    <div class="faq-item mb-md">
+                        <h4>Q: After paying $500?</h4>
+                        <p class="text-sm text-secondary">A: Unlock 4 projects. Full access + direct contact.</p>
+                    </div>
+                    <div class="faq-item mb-md">
+                        <h4>Q: Can I view more?</h4>
+                        <p class="text-sm text-secondary">A: Yes, each $500 unlocks 4 more.</p>
+                    </div>
+                    <div class="faq-item mb-md">
+                        <h4>Q: Refunds?</h4>
+                        <p class="text-sm text-secondary">A: No. Fee ensures commitment and careful selection.</p>
+                    </div>
+                    <div class="faq-item mb-md">
+                        <h4>Q: Investment sizes?</h4>
+                        <p class="text-sm text-secondary">A: Typically $25k - $200k per investor.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 11: Final CTA -->
+        <section class="section full-width bg-gradient text-white text-center py-2xl">
+            <div class="container grid grid-cols-2 gap-xl">
+                <div class="text-center border-r border-white-20">
+                    <h2 class="text-white mb-sm">Raising Pre-Seed or Angel Capital?</h2>
+                    <p class="mb-lg">Stop chasing ghosts. Start conversations with committed investors.</p>
+                    <a href="#register" onclick="setSignupType('developer')"
+                        class="btn btn-light text-primary btn-lg">Submit Your Startup</a>
+                    <p class="text-xs mt-sm opacity-80">No upfront costs. Success fee only.</p>
+                </div>
+                <div class="text-center">
+                    <h2 class="text-white mb-sm">Deploying Capital?</h2>
+                    <p class="mb-lg">Skip the noise. Review vetted opportunities.</p>
+                    <a href="#register" onclick="setSignupType('investor')"
+                        class="btn btn-outline border-white text-white btn-lg hover:bg-white hover:text-primary">Browse
+                        Opportunities</a>
+                    <p class="text-xs mt-sm opacity-80">$500 unlocks 4 detailed evaluations.</p>
                 </div>
             </div>
         </section>
@@ -509,13 +811,50 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div>© 2024 UkuvaGo. All rights reserved.</div>
-                <div class="footer-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Contact</a>
+            <div class="grid grid-cols-4 gap-lg mb-lg">
+                <div>
+                    <h4>AngelVault</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="#">About</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#">SAFE Note Framework</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
                 </div>
+                <div>
+                    <h4>For Founders</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="#register" onclick="setSignupType('developer')">Submit Startup</a></li>
+                        <li><a href="#">Founder FAQ</a></li>
+                        <li><a href="#">Success Stories</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>For Investors</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="#projects">Browse Opportunities</a></li>
+                        <li><a href="#">Investor FAQ</a></li>
+                        <li><a href="#">Due Diligence Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Legal</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy (POPIA)</a></li>
+                        <li><a href="#">NDA Template</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom text-center text-sm text-secondary">
+                <p class="mb-sm">© 2024 Ukuva Consulting | AngelVault Built in Amsterdam 🇳🇱 | Serving Africa 🌍</p>
+                <p class="text-xs opacity-70 max-w-4xl mx-auto">
+                    Disclaimers: AngelVault is a marketplace platform connecting startups and investors. We do not
+                    provide investment advice, legal advice, or guarantee investment outcomes. All investments carry
+                    risk. Investors should conduct their own due diligence. SAFE notes are legally binding
+                    contracts—consult with legal counsel. Compliance: POPIA-compliant data processing.
+                </p>
             </div>
         </div>
     </footer>
