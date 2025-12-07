@@ -7,7 +7,6 @@ import (
 
 	"github.com/ukuvago/angel-platform/internal/config"
 	"github.com/ukuvago/angel-platform/internal/database"
-	"github.com/ukuvago/angel-platform/internal/models"
 	"github.com/ukuvago/angel-platform/internal/routes"
 	"github.com/ukuvago/angel-platform/internal/services"
 )
@@ -22,26 +21,13 @@ func main() {
 	// Initialize database ASYNCHRONOUSLY to prevent Cloud Run timeouts
 	go func() {
 		log.Println("Background: Initializing database connection...")
+		// Initialize database
 		if err := database.Initialize(cfg); err != nil {
 			log.Fatalf("CRITICAL: Failed to initialize database: %v", err)
 		}
 		log.Println("Background: Database initialized successfully.")
 
-		// Auto-migrate
-		if err := database.DB.AutoMigrate(
-			&models.User{},
-			&models.Project{},
-			&models.InvestmentOffer{},
-			&models.Category{},
-			&models.NDA{},
-		); err != nil {
-			log.Fatalf("Migration failed: %v", err)
-		}
-
-		// Seed data
-		if err := database.SeedCategories(); err != nil {
-			log.Printf("Warning: Failed to seed categories: %v", err)
-		}
+		// Seed projects (separate from initial seedData which handles static data)
 		if err := database.SeedProjects(); err != nil {
 			log.Printf("Warning: Failed to seed projects: %v", err)
 		}

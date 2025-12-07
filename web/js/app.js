@@ -89,26 +89,24 @@ function createToastContainer() {
 function updateNav() {
     const authNav = document.getElementById('auth-nav');
     const userNav = document.getElementById('user-nav');
-    const navAuthContainer = document.getElementById('nav-auth');
 
     if (!authNav || !userNav) return;
 
     if (currentUser) {
         authNav.classList.add('hidden');
         userNav.classList.remove('hidden');
-        if (navAuthContainer) {
-            navAuthContainer.innerHTML = `
-            <div class="dropdown">
-                <button class="btn btn-secondary" onclick="toggleDropdown()">
-                    ${currentUser.first_name} (${currentUser.role}) ▾
-                </button>
-                <div id="user-dropdown" class="dropdown-content hidden">
-                    <a href="#dashboard">Dashboard</a>
-                    <a href="#profile">My Profile</a>
-                    <a href="#" onclick="logout()">Logout</a>
-                </div>
-            </div>`;
-        }
+
+        userNav.innerHTML = `
+        <div class="dropdown">
+            <button class="btn btn-secondary" onclick="toggleDropdown()">
+                ${currentUser.first_name} (${currentUser.role}) ▾
+            </button>
+            <div id="user-dropdown" class="dropdown-content hidden">
+                <a href="#dashboard">Dashboard</a>
+                <a href="#profile">My Profile</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>`;
     } else {
         authNav.classList.remove('hidden');
         userNav.classList.add('hidden');
