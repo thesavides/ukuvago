@@ -444,30 +444,65 @@
 
     </div>
 
-    <!-- Change Password Modal/Page -->
-    <div data-page="change-password" class="hidden" style="padding-top:100px">
-        <div class="container" style="max-width:500px">
+    <!-- Profile Page -->
+    <div data-page="profile" class="hidden" style="padding-top:100px">
+        <div class="container" style="max-width:600px">
             <div class="card">
-                <div class="card-header text-center">
-                    <h2>Change Password</h2>
+                <div class="card-header">
+                    <h2>My Profile</h2>
                 </div>
-                <form id="change-password-form">
-                    <div class="form-group">
-                        <label class="form-label">Current Password</label>
-                        <input type="password" name="current_password" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">New Password</label>
-                        <input type="password" name="new_password" class="form-control" required minlength="8">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Confirm New Password</label>
-                        <input type="password" name="confirm_password" class="form-control" required minlength="8">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-full">Update Password</button>
-                    <button type="button" class="btn btn-secondary w-full mt-sm"
-                        onclick="history.back()">Cancel</button>
-                </form>
+
+                <div class="tabs mb-md">
+                    <button class="btn btn-primary" onclick="switchProfileTab('details')"
+                        id="tab-btn-details">Details</button>
+                    <button class="btn btn-outline" onclick="switchProfileTab('security')"
+                        id="tab-btn-security">Security</button>
+                </div>
+
+                <!-- Details Tab -->
+                <div id="profile-details">
+                    <form id="update-profile-form">
+                        <div class="grid grid-cols-2 gap-md">
+                            <div class="form-group">
+                                <label class="form-label">First Name</label>
+                                <input type="text" name="first_name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="last_name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" name="company_name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" disabled style="opacity:0.7">
+                            <p class="text-xs text-secondary">Email cannot be changed.</p>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+
+                <!-- Security Tab -->
+                <div id="profile-security" class="hidden">
+                    <form id="change-password-form">
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" name="current_password" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" name="new_password" class="form-control" required minlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" name="confirm_password" class="form-control" required minlength="8">
+                        </div>
+                        <button type="submit" class="btn btn-error text-white">Change Password</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

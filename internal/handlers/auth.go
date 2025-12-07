@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ukuvago/angel-platform/internal/database"
 	"github.com/ukuvago/angel-platform/internal/middleware"
 	"github.com/ukuvago/angel-platform/internal/models"
 	"github.com/ukuvago/angel-platform/internal/services"
@@ -241,7 +242,45 @@ type ChangePasswordRequest struct {
 	NewPassword     string `json:"new_password" binding:"required,min=8"`
 }
 
-// ChangePassword changes the authenticated user's password
+// UpdateProfile updates the authenticated user's profile
+func UpdateProfile(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	var input struct {
+		FirstName   string `json:"first_name"`
+		LastName    string `json:"last_name"`
+		CompanyName string `json:"company_name"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.First(&user, userId).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	if input.FirstName != "" {
+		user.FirstName = input.FirstName
+	}
+	if input.LastName != "" {
+		user.LastName = input.LastName
+	}
+	if input.CompanyName != "" {
+		user.CompanyName = input.CompanyName
+	}
+
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update profile"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully", "user": user})
+}
+
+// ChangePassword handles password updatesuthenticated user's password
 func (h *AuthHandler) ChangePassword(c *gin.Context) {
 	userID, exists := middleware.GetUserID(c)
 	if !exists {

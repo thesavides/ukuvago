@@ -100,7 +100,7 @@ function updateNav() {
             </button>
             <div id="user-dropdown" class="dropdown-content hidden">
                 <a href="#dashboard">Dashboard</a>
-                <a href="#change-password">Change Password</a>
+                <a href="#profile">My Profile</a>
                 <a href="#" onclick="logout()">Logout</a>
             </div>
         </div>
@@ -109,6 +109,10 @@ function updateNav() {
         authNav?.classList.remove('hidden');
         userNav?.classList.add('hidden');
     }
+}
+
+window.toggleDropdown = function () {
+    document.getElementById('user-dropdown').classList.toggle('hidden');
 }
 
 // Page routing
@@ -179,14 +183,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!currentUser || (currentUser.role !== 'developer' && currentUser.role !== 'admin')) { showPage('login'); return; }
         loadCreateProject();
     };
-    pages['change-password'] = () => {
+    pages['profile'] = () => {
         if (!currentUser) { showPage('login'); return; }
-        // Pre-fill if needed, mostly just show the form
+        loadProfile();
     };
     pages.developer = () => {
         if (!currentUser || currentUser.role !== 'developer') { showPage('login'); return; }
         loadDeveloperDashboard();
     };
+    // ... rest
+    // ...
+
+    // Profile Functions
+    window.switchProfileTab = function (tab) {
+        const detailsTab = document.getElementById('profile-details');
+        const securityTab = document.getElementById('profile-security');
+        const btnDetails = document.getElementById('tab-btn-details');
+        const btnSecurity = document.getElementById('tab-btn-security');
+
+        if (tab === 'details') {
+            detailsTab.classList.remove('hidden');
+            securityTab.classList.add('hidden');
+            btnDetails.classList.replace('btn-outline', 'btn-primary');
+            btnSecurity.classList.replace('btn-primary', 'btn-outline');
+        } else {
+            detailsTab.classList.add('hidden');
+            securityTab.classList.remove('hidden');
+            btnDetails.classList.replace('btn-primary', 'btn-outline');
+            btnSecurity.classList.replace('btn-outline', 'btn-primary');
+        }
+    }
+
+    function loadProfile() {
+        const form = document.getElementById('update-profile-form');
+        if (!form || !currentUser) return;
+        form.first_name.value = currentUser.first_name;
+        form.last_name.value = currentUser.last_name;
+        form.company_name.value = currentUser.company_name || '';
+        form.email.value = currentUser.email;
+    }
+
+    document.getElementById('update-profile-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            first_name: e.target.first_name.value,
+            last_name: e.target.last_name.value,
+            company_name: e.target.company_name.value
+        };
+        try {
+            const res = await api.put('/auth/profile', data);
+            currentUser = res.user; // Update local user
+            updateNav(); // Reflect changes in nav
+            showToast('Profile updated', 'success');
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    });
+
+    document.getElementById('change-password-form')?.addEventListener('submit', async (e) => {
+        // ... existing logic ...
+        e.preventDefault();
+        // ...
+        const form = e.target;
+        // ...
+        // ...
+        try {
+            await api.put('/auth/password', {
+                current_password: form.current_password.value,
+                new_password: form.new_password.value
+            });
+            showToast('Password updated successfully', 'success');
+            form.reset();
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    });
     pages.admin = () => {
         if (!currentUser || currentUser.role !== 'admin') { showPage('login'); return; }
         loadAdminDashboard();
