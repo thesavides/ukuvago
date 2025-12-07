@@ -122,37 +122,84 @@ const pages = {};
 
 function showPage(pageName, params = {}) {
     // Try to find a direct page match
-    let page = document.querySelector(`[data-page="${pageName}"]`);
+    let pageElement = document.querySelector(`[data-page="${pageName}"]`);
     let scrollTarget = null;
 
     // If no direct page match, check if it's an element ID (like a section anchor)
-    if (!page) {
+    if (!pageElement) {
         const element = document.getElementById(pageName);
         if (element) {
             // Find the parent page for this element
-            page = element.closest('[data-page]');
-            if (page) {
+            pageElement = element.closest('[data-page]');
+            if (pageElement) {
                 scrollTarget = element;
             }
         }
     }
 
     // Default to home if still no page found
-    if (!page) {
+    if (!pageElement) {
         console.warn(`Page or section "${pageName}" not found. Defaulting to home.`);
-        page = document.querySelector('[data-page="home"]');
+        pageElement = document.querySelector('[data-page="home"]');
         pageName = "home"; // normalizing
     }
 
-    if (page) {
+    // Get the resolved page name from the element's dataset
+    const resolvedPageName = pageElement ? pageElement.dataset.page : pageName;
+
+    // --- Start of new routing logic ---
+
+    // If the current hash already matches the target page, prevent re-routing unless it's a specific section
+    if (window.location.hash.slice(1) === resolvedPageName && !scrollTarget) {
+        // If we are already on the target page and not trying to scroll to a specific section, do nothing.
+        // This prevents infinite loops from hash changes that resolve to the same page.
+        return;
+    }
+
+    // Valid pages check (ensure there's an initializer for the page)
+    if (!pages[resolvedPageName]) {
+        console.warn(`No initializer found for page "${resolvedPageName}". Redirecting to home.`);
+        window.location.hash = 'home';
+        return;
+    }
+
+    // Redirect if accessing auth pages while logged in
+    if ((resolvedPageName === 'login' || resolvedPageName === 'register') && currentUser) {
+        let targetHash = 'dashboard'; // Default dashboard
+        if (currentUser.role === 'admin') targetHash = 'admin';
+        else if (currentUser.role === 'developer') targetHash = 'developer';
+        // If the user is already on the target dashboard, don't redirect again
+        if (window.location.hash.slice(1) !== targetHash) {
+            window.location.hash = targetHash;
+        }
+        return;
+    }
+
+    // Role-based protection
+    if (resolvedPageName === 'admin' && (!currentUser || currentUser.role !== 'admin')) {
+        if (window.location.hash.slice(1) !== 'home') {
+            window.location.hash = 'home';
+        }
+        return;
+    }
+
+    if (resolvedPageName === 'developer' && (!currentUser || currentUser.role !== 'developer')) {
+        if (window.location.hash.slice(1) !== 'home') {
+            window.location.hash = 'home';
+        }
+        return;
+    }
+
+    // --- End of new routing logic ---
+
+    if (pageElement) {
         // Hide all pages
         document.querySelectorAll('[data-page]').forEach(p => p.classList.add('hidden'));
 
         // Show target page
-        page.classList.remove('hidden');
+        pageElement.classList.remove('hidden');
 
-        // Run initializer if it exists (use the dataset.page name in case we resolved from a child)
-        const resolvedPageName = page.dataset.page;
+        // Run initializer if it exists
         if (pages[resolvedPageName]) pages[resolvedPageName](params);
 
         // Handle scrolling

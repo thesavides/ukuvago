@@ -27,7 +27,18 @@ func NewAdminHandler(emailService *services.EmailService, authService *services.
 
 // GetDashboardStats returns platform statistics
 func (h *AdminHandler) GetDashboardStats(c *gin.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("PANIC in GetDashboardStats: %v", r)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		}
+	}()
+
 	db := database.GetDB()
+	if db == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Database not initialized"})
+		return
+	}
 
 	var stats struct {
 		TotalUsers       int64 `json:"total_users"`
@@ -42,27 +53,30 @@ func (h *AdminHandler) GetDashboardStats(c *gin.Context) {
 		TotalRevenue     int64 `json:"total_revenue"`
 	}
 
-	// Use Find/Count individually and log errors
-	if err := db.Model(&models.User{}).Count(&stats.TotalUsers).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count users: " + err.Error()})
-		return
+	// Helper to log errors but continue if possible (or fail fast if critical)
+	check := func(err error, task string) {
+		if err != nil {
+			log.Printf("Error in stats %s: %v", task, err)
+		}
 	}
-	db.Model(&models.User{}).Where("role = ?", models.RoleInvestor).Count(&stats.TotalInvestors)
-	db.Model(&models.User{}).Where("role = ?", models.RoleDeveloper).Count(&stats.TotalDevelopers)
 
-	if err := db.Model(&models.Project{}).Count(&stats.TotalProjects).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count projects: " + err.Error()})
-		return
+	check(db.Model(&models.User{}).Count(&stats.TotalUsers).Error, "Count Users")
+	check(db.Model(&models.User{}).Where("role = ?", models.RoleInvestor).Count(&stats.TotalInvestors).Error, "Count Investors")
+	check(db.Model(&models.User{}).Where("role = ?", models.RoleDeveloper).Count(&stats.TotalDevelopers).Error, "Count Developers")
+
+	// Ensure Project table exists
+	if db.Migrator().HasTable(&models.Project{}) {
+		check(db.Model(&models.Project{}).Count(&stats.TotalProjects).Error, "Count Projects")
+		check(db.Model(&models.Project{}).Where("status = ?", models.ProjectStatusApproved).Count(&stats.ApprovedProjects).Error, "Count Approved")
+		check(db.Model(&models.Project{}).Where("status = ?", models.ProjectStatusPending).Count(&stats.PendingProjects).Error, "Count Pending")
 	}
-	db.Model(&models.Project{}).Where("status = ?", models.ProjectStatusApproved).Count(&stats.ApprovedProjects)
-	db.Model(&models.Project{}).Where("status = ?", models.ProjectStatusPending).Count(&stats.PendingProjects)
 
-	db.Model(&models.InvestmentOffer{}).Count(&stats.TotalOffers)
-	db.Model(&models.InvestmentOffer{}).Where("status = ?", models.OfferStatusAccepted).Count(&stats.AcceptedOffers)
+	check(db.Model(&models.InvestmentOffer{}).Count(&stats.TotalOffers).Error, "Count Offers")
+	check(db.Model(&models.InvestmentOffer{}).Where("status = ?", models.OfferStatusAccepted).Count(&stats.AcceptedOffers).Error, "Count Accepted Offers")
 
-	db.Model(&models.Payment{}).Where("status = ?", models.PaymentStatusCompleted).Count(&stats.TotalPayments)
+	check(db.Model(&models.Payment{}).Where("status = ?", models.PaymentStatusCompleted).Count(&stats.TotalPayments).Error, "Count Payments")
 
-	// Calculate total revenue - Handle potential NULL/Error safely
+	// Revenue Calculation
 	var revenue sql.NullInt64
 	err := db.Model(&models.Payment{}).
 		Where("status = ?", models.PaymentStatusCompleted).
@@ -70,15 +84,10 @@ func (h *AdminHandler) GetDashboardStats(c *gin.Context) {
 		Scan(&revenue).Error
 
 	if err != nil {
-		// Log but don't fail, just return 0
 		log.Printf("Error calculating revenue: %v", err)
 		stats.TotalRevenue = 0
-	} else {
-		if revenue.Valid {
-			stats.TotalRevenue = revenue.Int64
-		} else {
-			stats.TotalRevenue = 0
-		}
+	} else if revenue.Valid {
+		stats.TotalRevenue = revenue.Int64
 	}
 
 	c.JSON(http.StatusOK, stats)
