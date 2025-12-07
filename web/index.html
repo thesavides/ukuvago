@@ -416,6 +416,7 @@
             <div class="tabs mb-md">
                 <button class="btn btn-secondary" onclick="switchAdminTab('pending')">Pending Projects</button>
                 <button class="btn btn-outline" onclick="switchAdminTab('all')">All Projects</button>
+                <button class="btn btn-outline" onclick="switchAdminTab('categories')">Categories</button>
             </div>
 
             <!-- Pending Projects Table -->
@@ -454,6 +455,54 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Categories Container -->
+            <div id="admin-categories-container" class="card hidden">
+                <div class="flex justify-between items-center mb-md">
+                    <h3>Manage Categories</h3>
+                    <button class="btn btn-secondary btn-sm" onclick="openCategoryModal()">+ Add Category</button>
+                </div>
+                <div class="table-container">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left">Name</th>
+                                <th style="text-align:left">Description</th>
+                                <th style="text-align:left">Icon</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-categories-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="modal hidden">
+        <div class="modal-content card" style="max-width:400px">
+            <h3 id="category-modal-title">Add Category</h3>
+            <form id="category-form">
+                <input type="hidden" name="id">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Icon (Emoji/Text)</label>
+                    <input type="text" name="icon" class="form-control" placeholder="e.g. 🚀">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="flex gap-sm mt-md">
+                    <button type="submit" class="btn btn-primary flex-1">Save</button>
+                    <button type="button" class="btn btn-secondary flex-1"
+                        onclick="closeCategoryModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 

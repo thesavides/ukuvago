@@ -466,18 +466,111 @@ async function loadAdminDashboard() {
 }
 
 window.switchAdminTab = function (tab) {
+    // Toggle containers
     const pendingContainer = document.getElementById('admin-pending-container');
     const allContainer = document.getElementById('admin-all-container');
+    const categoriesContainer = document.getElementById('admin-categories-container');
 
-    // Toggle containers
+    pendingContainer.classList.add('hidden');
+    allContainer.classList.add('hidden');
+    categoriesContainer.classList.add('hidden');
+
     if (tab === 'pending') {
         pendingContainer.classList.remove('hidden');
-        allContainer.classList.add('hidden');
         loadAdminPendingProjects();
-    } else {
-        pendingContainer.classList.add('hidden');
+    } else if (tab === 'all') {
         allContainer.classList.remove('hidden');
         loadAdminAllProjects();
+    } else if (tab === 'categories') {
+        categoriesContainer.classList.remove('hidden');
+        loadAdminCategories();
+    }
+}
+
+async function loadAdminCategories() {
+    const tbody = document.getElementById('admin-categories-list');
+    tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+    try {
+        const data = await api.get('/categories');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">No categories found</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.map(c => `
+            <tr>
+                <td>${c.name}</td>
+                <td>${c.description || '-'}</td>
+                <td>${c.icon || ''}</td>
+                <td class="text-right">
+                    <button class="btn btn-secondary btn-sm" onclick='openCategoryModal(${JSON.stringify(c)})'>Edit</button>
+                    <button class="btn btn-outline btn-sm text-error" onclick="deleteCategory('${c.id}')">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-error">Failed to load</td></tr>';
+    }
+}
+
+// Category Management
+window.openCategoryModal = function (category = null) {
+    const modal = document.getElementById('category-modal');
+    const form = document.getElementById('category-form');
+    const title = document.getElementById('category-modal-title');
+
+    form.reset();
+
+    if (category) {
+        title.textContent = 'Edit Category';
+        form.id.value = category.id;
+        form.name.value = category.name;
+        form.icon.value = category.icon || '';
+        form.description.value = category.description || '';
+    } else {
+        title.textContent = 'Add Category';
+        form.id.value = '';
+    }
+
+    modal.classList.remove('hidden');
+}
+
+window.closeCategoryModal = function () {
+    document.getElementById('category-modal').classList.add('hidden');
+}
+
+document.getElementById('category-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const id = form.id.value;
+    const data = {
+        name: form.name.value,
+        icon: form.icon.value,
+        description: form.description.value
+    };
+
+    try {
+        if (id) {
+            await api.put(`/admin/categories/${id}`, data);
+            showToast('Category updated', 'success');
+        } else {
+            await api.post('/admin/categories', data);
+            showToast('Category created', 'success');
+        }
+        closeCategoryModal();
+        loadAdminCategories();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+});
+
+window.deleteCategory = async function (id) {
+    if (!confirm('Startups in this category might be affected. Delete?')) return;
+    try {
+        await api.delete(`/admin/categories/${id}`);
+        showToast('Category deleted', 'success');
+        loadAdminCategories();
+    } catch (err) {
+        showToast('Cannot delete: ' + err.message, 'error');
     }
 }
 
