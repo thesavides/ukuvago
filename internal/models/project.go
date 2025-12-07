@@ -50,6 +50,8 @@ type Project struct {
 	BusinessModel   string         `gorm:"type:text" json:"business_model"`
 	Traction        string         `gorm:"type:text" json:"traction"`
 	Team            string         `gorm:"type:text" json:"team"`
+	TeamProfileURL  string         `gorm:"size:255" json:"team_profile_url"` // LinkedIn or website
+	PitchDeck       string         `gorm:"size:255" json:"pitch_deck"`       // Path to PDF file
 	MinInvestment   float64        `gorm:"not null" json:"min_investment"`
 	MaxInvestment   float64        `json:"max_investment"`
 	EquityOffered   float64        `json:"equity_offered"` // percentage
@@ -64,10 +66,10 @@ type Project struct {
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relations
-	Developer *User           `gorm:"foreignKey:DeveloperID" json:"developer,omitempty"`
-	Category  *Category       `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
-	Images    []ProjectImage  `gorm:"foreignKey:ProjectID" json:"images,omitempty"`
-	Views     []ProjectView   `gorm:"foreignKey:ProjectID" json:"views,omitempty"`
+	Developer *User             `gorm:"foreignKey:DeveloperID" json:"developer,omitempty"`
+	Category  *Category         `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Images    []ProjectImage    `gorm:"foreignKey:ProjectID" json:"images,omitempty"`
+	Views     []ProjectView     `gorm:"foreignKey:ProjectID" json:"views,omitempty"`
 	Offers    []InvestmentOffer `gorm:"foreignKey:ProjectID" json:"offers,omitempty"`
 }
 

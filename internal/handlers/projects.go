@@ -149,23 +149,25 @@ func (h *ProjectHandler) GetCategories(c *gin.Context) {
 
 // CreateProjectRequest represents project creation input
 type CreateProjectRequest struct {
-	Title         string    `json:"title" binding:"required"`
-	Tagline       string    `json:"tagline"`
-	CategoryID    uuid.UUID `json:"category_id" binding:"required"`
-	Description   string    `json:"description" binding:"required"`
-	PitchContent  string    `json:"pitch_content"`
-	Problem       string    `json:"problem"`
-	Solution      string    `json:"solution"`
-	TargetMarket  string    `json:"target_market"`
-	BusinessModel string    `json:"business_model"`
-	Traction      string    `json:"traction"`
-	Team          string    `json:"team"`
-	MinInvestment float64   `json:"min_investment" binding:"required"`
-	MaxInvestment float64   `json:"max_investment"`
-	EquityOffered float64   `json:"equity_offered"`
-	ValuationCap  float64   `json:"valuation_cap"`
+	Title          string    `json:"title" form:"title" binding:"required"`
+	Tagline        string    `json:"tagline" form:"tagline"`
+	CategoryID     uuid.UUID `json:"category_id" form:"category_id" binding:"required"`
+	Description    string    `json:"description" form:"description" binding:"required"`
+	PitchContent   string    `json:"pitch_content" form:"pitch_content"`
+	Problem        string    `json:"problem" form:"problem"`
+	Solution       string    `json:"solution" form:"solution"`
+	TargetMarket   string    `json:"target_market" form:"target_market"`
+	BusinessModel  string    `json:"business_model" form:"business_model"`
+	Traction       string    `json:"traction" form:"traction"`
+	Team           string    `json:"team" form:"team"`
+	TeamProfileURL string    `json:"team_profile_url" form:"team_profile_url"`
+	MinInvestment  float64   `json:"min_investment" form:"min_investment" binding:"required"`
+	MaxInvestment  float64   `json:"max_investment" form:"max_investment"`
+	EquityOffered  float64   `json:"equity_offered" form:"equity_offered"`
+	ValuationCap   float64   `json:"valuation_cap" form:"valuation_cap"`
 }
 
+// CreateProject creates a new project (developer only)
 // CreateProject creates a new project (developer only)
 func (h *ProjectHandler) CreateProject(c *gin.Context) {
 	userID, exists := middleware.GetUserID(c)
@@ -174,36 +176,71 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 		return
 	}
 
+	// Use ShouldBind to support both JSON and Multipart Form
 	var req CreateProjectRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	projectID := uuid.New()
+	var pitchDeckPath string
+
+	// Handle Pitch Deck Upload (PDF)
+	file, err := c.FormFile("pitch_deck_file")
+	if err == nil {
+		// File provided
+		path, err := h.storageService.SavePitchDeck(projectID, file)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Pitch deck error: " + err.Error()})
+			return
+		}
+		pitchDeckPath = path
+	}
+
 	project := &models.Project{
-		DeveloperID:   userID,
-		CategoryID:    req.CategoryID,
-		Title:         req.Title,
-		Tagline:       req.Tagline,
-		Description:   req.Description,
-		PitchContent:  req.PitchContent,
-		Problem:       req.Problem,
-		Solution:      req.Solution,
-		TargetMarket:  req.TargetMarket,
-		BusinessModel: req.BusinessModel,
-		Traction:      req.Traction,
-		Team:          req.Team,
-		MinInvestment: req.MinInvestment,
-		MaxInvestment: req.MaxInvestment,
-		EquityOffered: req.EquityOffered,
-		ValuationCap:  req.ValuationCap,
-		Status:        models.ProjectStatusDraft,
+		ID:             projectID,
+		DeveloperID:    userID,
+		CategoryID:     req.CategoryID,
+		Title:          req.Title,
+		Tagline:        req.Tagline,
+		Description:    req.Description,
+		PitchContent:   req.PitchContent,
+		Problem:        req.Problem,
+		Solution:       req.Solution,
+		TargetMarket:   req.TargetMarket,
+		BusinessModel:  req.BusinessModel,
+		Traction:       req.Traction,
+		Team:           req.Team,
+		TeamProfileURL: req.TeamProfileURL,
+		PitchDeck:      pitchDeckPath,
+		MinInvestment:  req.MinInvestment,
+		MaxInvestment:  req.MaxInvestment,
+		EquityOffered:  req.EquityOffered,
+		ValuationCap:   req.ValuationCap,
+		Status:         models.ProjectStatusDraft,
 	}
 
 	db := database.GetDB()
 	if err := db.Create(project).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create project"})
 		return
+	}
+
+	// Handle Image Upload (Optional)
+	imgFile, err := c.FormFile("image")
+	if err == nil {
+		path, name, err := h.storageService.SaveProjectImage(projectID, imgFile)
+		if err == nil {
+			image := &models.ProjectImage{
+				ProjectID:    projectID,
+				FilePath:     path,
+				FileName:     name,
+				IsPrimary:    true,
+				DisplayOrder: 0,
+			}
+			db.Create(image)
+		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{

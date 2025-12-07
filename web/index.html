@@ -140,6 +140,132 @@
         </div>
     </div>
 
+    <!-- Developer Dashboard -->
+    <div data-page="developer" class="hidden" style="padding-top:100px">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Developer <span class="text-gradient">Dashboard</span></h2>
+                <div class="flex gap-md justify-center">
+                    <button class="btn btn-primary" onclick="showPage('create-project')">Create New Project</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>My Projects</h3>
+                <div class="table-container">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left">Project</th>
+                                <th style="text-align:left">Status</th>
+                                <th style="text-align:left">Investment</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="developer-projects-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Project Page -->
+    <div data-page="create-project" class="hidden" style="padding-top:100px">
+        <div class="container" style="max-width:800px">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2>Create New Project</h2>
+                    <p class="text-secondary">Submit your startup for funding</p>
+                </div>
+                <form id="create-project-form">
+                    <!-- Basic Info -->
+                    <h3 class="mb-md">Basic Information</h3>
+                    <div class="form-group">
+                        <label class="form-label">Project Title</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tagline (Short pitch)</label>
+                        <input type="text" name="tagline" class="form-control" placeholder="e.g. Uber for Cats"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select name="category_id" id="create-project-category" class="form-control" required>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Details -->
+                    <h3 class="mb-md mt-lg">Project Details</h3>
+                    <div class="form-group">
+                        <label class="form-label">Description (Summary)</label>
+                        <textarea name="description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                        <div class="form-group">
+                            <label class="form-label">The Problem</label>
+                            <textarea name="problem" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">The Solution</label>
+                            <textarea name="solution" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Team -->
+                    <h3 class="mb-md mt-lg">Team</h3>
+                    <div class="form-group">
+                        <label class="form-label">Team Members</label>
+                        <textarea name="team" class="form-control" rows="2"
+                            placeholder="List key team members..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Team Profile URL (LinkedIn/Website)</label>
+                        <input type="url" name="team_profile_url" class="form-control" placeholder="https://...">
+                    </div>
+
+                    <!-- Investment -->
+                    <h3 class="mb-md mt-lg">Investment Terms</h3>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                        <div class="form-group">
+                            <label class="form-label">Min Investment</label>
+                            <input type="number" name="min_investment" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Funding Goal (Max)</label>
+                            <input type="number" name="max_investment" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Equity Offered (%)</label>
+                            <input type="number" name="equity_offered" class="form-control" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valuation Cap</label>
+                            <input type="number" name="valuation_cap" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Media -->
+                    <h3 class="mb-md mt-lg">Media & Documents</h3>
+                    <div class="form-group">
+                        <label class="form-label">Project Image (Cover)</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pitch Deck (PDF)</label>
+                        <input type="file" name="pitch_deck_file" class="form-control" accept="application/pdf">
+                        <span class="form-hint">Upload your full presentation (Max 10MB)</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full mt-lg">Submit Project</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Register Page -->
     <div data-page="register" class="hidden" style="padding-top:100px">
         <div class="container" style="max-width:560px">

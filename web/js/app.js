@@ -167,6 +167,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (currentUser.role === 'investor') window.location.hash = 'investor';
         else window.location.hash = 'developer';
     };
+    pages['create-project'] = () => {
+        if (!currentUser || currentUser.role !== 'developer') { showPage('login'); return; }
+        loadCreateProject();
+    };
+    pages.developer = () => {
+        if (!currentUser || currentUser.role !== 'developer') { showPage('login'); return; }
+        loadDeveloperDashboard();
+    };
     pages.admin = () => {
         if (!currentUser || currentUser.role !== 'admin') { showPage('login'); return; }
         loadAdminDashboard();
@@ -270,6 +278,117 @@ async function viewProject(id) {
     }
     window.location.hash = `project/${id}`;
 }
+
+// Developer Dashboard
+async function loadDeveloperDashboard() {
+    const list = document.getElementById('developer-projects-list');
+    if (!list) return;
+
+    list.innerHTML = '<tr><td colspan="4" class="text-center">Loading...</td></tr>';
+
+    try {
+        const data = await api.get('/developer/projects');
+
+        if (!data.projects?.length) {
+            list.innerHTML = '<tr><td colspan="4" class="text-center text-secondary">You haven\'t created any projects yet.</td></tr>';
+            return;
+        }
+
+        list.innerHTML = data.projects.map(p => `
+            <tr>
+                <td>
+                    <div style="font-weight:600">${p.title}</div>
+                    <div style="font-size:0.85em;color:#666">${p.tagline || ''}</div>
+                </td>
+                <td>
+                    <span class="badge ${getStatusBadgeClass(p.status)}">${p.status}</span>
+                </td>
+                <td>${formatCurrency(p.min_investment)}</td>
+                <td style="text-align:right">
+                    <button class="btn btn-sm btn-secondary" onclick="viewProject('${p.id}')">View</button>
+                    ${p.status === 'draft' ? `<button class="btn btn-sm btn-primary" onclick="submitProjectForReview('${p.id}')">Submit</button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        list.innerHTML = `<tr><td colspan="4" class="text-error">Error: ${err.message}</td></tr>`;
+    }
+}
+
+function getStatusBadgeClass(status) {
+    switch (status) {
+        case 'approved': return 'badge-success';
+        case 'pending': return 'badge-warning';
+        case 'rejected': return 'badge-error';
+        default: return 'badge-neutral';
+    }
+}
+
+async function submitProjectForReview(id) {
+    if (!confirm('Submit this project for admin review? You cannot edit it while it is pending.')) return;
+    try {
+        await api.post(`/projects/${id}/submit`);
+        showToast('Project submitted for review', 'success');
+        loadDeveloperDashboard();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
+
+// Expose functions
+window.submitProjectForReview = submitProjectForReview;
+
+// Create Project Logic
+async function loadCreateProject() {
+    const select = document.getElementById('create-project-category');
+    if (!select || select.children.length > 0) return; // Already loaded
+
+    try {
+        const data = await api.get('/categories');
+        select.innerHTML = '<option value="">Select Category...</option>' +
+            data.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    } catch (err) {
+        showToast('Failed to load categories', 'error');
+    }
+}
+
+document.getElementById('create-project-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+        // Use FormData for file upload
+        const formData = new FormData(e.target);
+
+        // Ensure numbers are numbers
+        // No manual JSON conversion needed, fetch sends FormData as multipart/form-data automatically
+        // But headers need to NOT have Content-Type: application/json
+
+        const token = localStorage.getItem('token');
+        const res = await fetch(API_BASE + '/projects', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // Let browser set Content-Type for multipart
+            },
+            body: formData
+        });
+
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Submission failed');
+
+        showToast('Project created successfully!', 'success');
+        e.target.reset();
+        window.location.hash = 'developer'; // Go to dashboard
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Project';
+    }
+});
 
 // Admin Dashboard Logic
 async function loadAdminDashboard() {
