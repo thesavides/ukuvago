@@ -568,17 +568,22 @@ async function loadAdminCategories() {
             tbody.innerHTML = '<tr><td colspan="4">No categories found</td></tr>';
             return;
         }
-        tbody.innerHTML = data.map(c => `
+        tbody.innerHTML = data.map(c => {
+            const iconDisplay = (c.icon && (c.icon.startsWith('http') || c.icon.startsWith('/') || c.icon.startsWith('data:')))
+                ? `<img src="${c.icon}" alt="${c.name}" class="h-8 w-8 object-contain">`
+                : `<span class="text-2xl">${c.icon || ''}</span>`;
+
+            return `
             <tr>
                 <td>${c.name}</td>
                 <td>${c.description || '-'}</td>
-                <td>${c.icon || ''}</td>
+                <td>${iconDisplay}</td>
                 <td class="text-right">
                     <button class="btn btn-secondary btn-sm" onclick='openCategoryModal(${JSON.stringify(c)})'>Edit</button>
                     <button class="btn btn-outline btn-sm text-error" onclick="deleteCategory('${c.id}')">Delete</button>
                 </td>
             </tr>
-        `).join('');
+        `}).join('');
     } catch (err) {
         tbody.innerHTML = '<tr><td colspan="4" class="text-error">Failed to load</td></tr>';
     }
