@@ -66,32 +66,28 @@ func seedData() error {
 	return SeedCategories()
 }
 
-// SeedCategories populates the database with default categories if empty
+// SeedCategories populates the database with default categories
 func SeedCategories() error {
-	var count int64
-	DB.Model(&models.Category{}).Count(&count)
-	if count > 0 {
-		return nil
-	}
-
 	categories := []models.Category{
 		{Name: "FinTech", Icon: "💳", Description: "Financial technology and services"},
 		{Name: "HealthTech", Icon: "🏥", Description: "Healthcare and medical technology"},
-		{Name: "SaaS / AI", Icon: "🚀", Description: "Software as a Service and Artificial Intelligence"},
+		{Name: "SaaS", Icon: "☁️", Description: "Software as a Service platforms"},
+		{Name: "AI & ML", Icon: "🤖", Description: "Artificial Intelligence and Machine Learning"},
 		{Name: "E-Commerce", Icon: "🛒", Description: "Online retail and marketplaces"},
 		{Name: "CleanTech", Icon: "🌍", Description: "Renewable energy and sustainability"},
 		{Name: "EdTech", Icon: "🎓", Description: "Education technology"},
 		{Name: "AgriTech", Icon: "🌾", Description: "Agricultural technology"},
-		{Name: "Logistics", Icon: "🚚", Description: "Supply chain and logistics"},
 		{Name: "PropTech", Icon: "🏠", Description: "Real estate technology"},
+		{Name: "Logistics", Icon: "🚚", Description: "Supply chain and logistics"},
 	}
 
 	for _, c := range categories {
-		if err := DB.Create(&c).Error; err != nil {
+		// Use FirstOrCreate to avoid duplicates but ensure these exist
+		if err := DB.Where(models.Category{Name: c.Name}).FirstOrCreate(&c).Error; err != nil {
 			return err
 		}
 	}
-	log.Println("Seeded categories")
+	log.Println("Seeded categories (idempotent check complete)")
 	return nil
 }
 
