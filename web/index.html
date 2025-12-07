@@ -211,7 +211,23 @@
     </footer>
 
     <div id="toast-container" class="toast-container"></div>
-    <script src="/static/js/app.js?v=4"></script>
+    <script>
+        window.onerror = function (msg, url, line) {
+            alert("JS Error: " + msg + "\nLine: " + line);
+            // Also log to document body in case alert is blocked
+            var div = document.createElement("div");
+            div.style.color = "red";
+            div.style.background = "white";
+            div.style.padding = "20px";
+            div.style.position = "fixed";
+            div.style.top = "0";
+            div.style.left = "0";
+            div.style.zIndex = "9999";
+            div.innerText = "JS Error: " + msg + " at line " + line;
+            document.body.appendChild(div);
+        };
+    </script>
+    <script src="/static/js/app.js?v=5"></script>
 </body>
 
 </html>
