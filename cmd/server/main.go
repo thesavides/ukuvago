@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/ukuvago/angel-platform/internal/config"
 	"github.com/ukuvago/angel-platform/internal/database"
@@ -33,6 +34,17 @@ func main() {
 			log.Println("Admin user ready (email: " + cfg.AdminEmail + ")")
 		}
 	}()
+
+	// Debug: Log web directory structure
+	log.Println("DEBUG: Listing web directory contents:")
+	filepath.Walk("web", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("Error accessing %s: %v", path, err)
+			return nil
+		}
+		log.Printf("Found: %s (Size: %d)", path, info.Size())
+		return nil
+	})
 
 	// Create upload directory
 	if err := os.MkdirAll(cfg.UploadDir, 0755); err != nil {

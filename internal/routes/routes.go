@@ -29,7 +29,11 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 
 	// Health check for Cloud Run
 	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "ok"})
+		c.JSON(200, gin.H{
+			"status":       "ok",
+			"version":      "v4",
+			"db_connected": database.GetDB() != nil,
+		})
 	})
 
 	// Serve static files with absolute paths to prevent fallback issues
@@ -186,7 +190,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 
 	// Serve frontend for all other routes
 	router.NoRoute(func(c *gin.Context) {
-		c.File("./web/index.html")
+		c.File(filepath.Join(wd, "web/index.html"))
 	})
 
 	return router
