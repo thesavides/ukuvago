@@ -1,8 +1,5 @@
 // UkuvaGo Angel Investment Platform - Frontend Application
 
-console.log("App starting... v4");
-alert("UkuvaGo Frontend Loaded v4 - If you see this, JS is running!");
-
 const API_BASE = '/api';
 let currentUser = null;
 let authToken = localStorage.getItem('token');
