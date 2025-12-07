@@ -183,6 +183,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			admin.GET("/users", adminHandler.ListAllUsers)
 			admin.GET("/projects", adminHandler.ListAllProjects)
 			admin.GET("/projects/pending", adminHandler.GetPendingProjects)
+			admin.GET("/projects/all", adminHandler.GetAllProjects)
 			admin.POST("/projects/:id/approve", adminHandler.ApproveProject)
 			admin.GET("/offers", adminHandler.ListAllOffers)
 			admin.GET("/payments", adminHandler.ListAllPayments)

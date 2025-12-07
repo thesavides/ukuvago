@@ -390,7 +390,10 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Admin <span class="text-gradient">Dashboard</span></h2>
-                <p class="section-subtitle">Manage platform activity and approve projects</p>
+                <div class="flex gap-md justify-between items-center">
+                    <p class="section-subtitle mb-0">Manage platform activity</p>
+                    <button class="btn btn-primary btn-sm" onclick="showPage('create-project')">Create Project</button>
+                </div>
             </div>
 
             <div class="card mb-lg">
@@ -411,10 +414,12 @@
             </div>
 
             <div class="tabs mb-md">
-                <button class="btn btn-secondary" onclick="loadAdminPendingProjects()">Pending Projects</button>
+                <button class="btn btn-secondary" onclick="switchAdminTab('pending')">Pending Projects</button>
+                <button class="btn btn-outline" onclick="switchAdminTab('all')">All Projects</button>
             </div>
 
-            <div class="card">
+            <!-- Pending Projects Table -->
+            <div id="admin-pending-container" class="card">
                 <h3>Projects Awaiting Approval</h3>
                 <div class="table-container">
                     <table class="table w-full">
@@ -427,9 +432,25 @@
                                 <th style="text-align:right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-pending-list">
-                            <!-- Populated by JS -->
-                        </tbody>
+                        <tbody id="admin-pending-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- All Projects Table -->
+            <div id="admin-all-container" class="card hidden">
+                <h3>All Projects</h3>
+                <div class="table-container">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left">Project</th>
+                                <th style="text-align:left">Status</th>
+                                <th style="text-align:left">Developer</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-all-list"></tbody>
                     </table>
                 </div>
             </div>
