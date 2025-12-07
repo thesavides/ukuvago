@@ -149,22 +149,23 @@ func (h *ProjectHandler) GetCategories(c *gin.Context) {
 
 // CreateProjectRequest represents project creation input
 type CreateProjectRequest struct {
-	Title          string    `json:"title" form:"title" binding:"required"`
-	Tagline        string    `json:"tagline" form:"tagline"`
-	CategoryID     uuid.UUID `json:"category_id" form:"category_id" binding:"required"`
-	Description    string    `json:"description" form:"description" binding:"required"`
-	PitchContent   string    `json:"pitch_content" form:"pitch_content"`
-	Problem        string    `json:"problem" form:"problem"`
-	Solution       string    `json:"solution" form:"solution"`
-	TargetMarket   string    `json:"target_market" form:"target_market"`
-	BusinessModel  string    `json:"business_model" form:"business_model"`
-	Traction       string    `json:"traction" form:"traction"`
-	Team           string    `json:"team" form:"team"`
-	TeamProfileURL string    `json:"team_profile_url" form:"team_profile_url"`
-	MinInvestment  float64   `json:"min_investment" form:"min_investment" binding:"required"`
-	MaxInvestment  float64   `json:"max_investment" form:"max_investment"`
-	EquityOffered  float64   `json:"equity_offered" form:"equity_offered"`
-	ValuationCap   float64   `json:"valuation_cap" form:"valuation_cap"`
+	Title          string  `json:"title" form:"title" binding:"required"`
+	Tagline        string  `json:"tagline" form:"tagline"`
+	CategoryID     string  `json:"category_id" form:"category_id" binding:"required"`
+	Description    string  `json:"description" form:"description" binding:"required"`
+	PitchContent   string  `json:"pitch_content" form:"pitch_content"`
+	Problem        string  `json:"problem" form:"problem"`
+	Solution       string  `json:"solution" form:"solution"`
+	TargetMarket   string  `json:"target_market" form:"target_market"`
+	BusinessModel  string  `json:"business_model" form:"business_model"`
+	Traction       string  `json:"traction" form:"traction"`
+	Team           string  `json:"team" form:"team"`
+	TeamProfileURL string  `json:"team_profile_url" form:"team_profile_url"`
+	WebsiteURL     string  `json:"website_url" form:"website_url"`
+	MinInvestment  float64 `json:"min_investment" form:"min_investment" binding:"required"`
+	MaxInvestment  float64 `json:"max_investment" form:"max_investment"`
+	EquityOffered  float64 `json:"equity_offered" form:"equity_offered"`
+	ValuationCap   float64 `json:"valuation_cap" form:"valuation_cap"`
 }
 
 // CreateProject creates a new project (developer only)
@@ -180,6 +181,13 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 	var req CreateProjectRequest
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Parse CategoryID manually to avoid multipart binding issues
+	categoryID, err := uuid.Parse(req.CategoryID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
 		return
 	}
 
@@ -201,7 +209,7 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 	project := &models.Project{
 		ID:             projectID,
 		DeveloperID:    userID,
-		CategoryID:     req.CategoryID,
+		CategoryID:     categoryID,
 		Title:          req.Title,
 		Tagline:        req.Tagline,
 		Description:    req.Description,
@@ -213,6 +221,7 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 		Traction:       req.Traction,
 		Team:           req.Team,
 		TeamProfileURL: req.TeamProfileURL,
+		WebsiteURL:     req.WebsiteURL,
 		PitchDeck:      pitchDeckPath,
 		MinInvestment:  req.MinInvestment,
 		MaxInvestment:  req.MaxInvestment,
@@ -252,6 +261,7 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 // UpdateProject updates a project (developer only, draft/rejected status)
 func (h *ProjectHandler) UpdateProject(c *gin.Context) {
 	userID, exists := middleware.GetUserID(c)
+	role, _ := middleware.GetUserRole(c)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authenticated"})
 		return
@@ -266,12 +276,19 @@ func (h *ProjectHandler) UpdateProject(c *gin.Context) {
 	db := database.GetDB()
 
 	var project models.Project
-	if err := db.First(&project, "id = ? AND developer_id = ?", projectID, userID).Error; err != nil {
+	// Admin can edit ANY project; Developer can only edit their own
+	query := db.Where("id = ?", projectID)
+	if role != models.RoleAdmin {
+		query = query.Where("developer_id = ?", userID)
+	}
+
+	if err := query.First(&project).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
 		return
 	}
 
-	if project.Status != models.ProjectStatusDraft && project.Status != models.ProjectStatusRejected {
+	// Admin can edit project in any status. Developer restricted to Draft/Rejected.
+	if role != models.RoleAdmin && project.Status != models.ProjectStatusDraft && project.Status != models.ProjectStatusRejected {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Cannot edit approved or pending projects"})
 		return
 	}
@@ -282,9 +299,18 @@ func (h *ProjectHandler) UpdateProject(c *gin.Context) {
 		return
 	}
 
+	// Parse CategoryID
+	if req.CategoryID != "" {
+		categoryID, err := uuid.Parse(req.CategoryID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+			return
+		}
+		project.CategoryID = categoryID
+	}
+
 	project.Title = req.Title
 	project.Tagline = req.Tagline
-	project.CategoryID = req.CategoryID
 	project.Description = req.Description
 	project.PitchContent = req.PitchContent
 	project.Problem = req.Problem
@@ -293,6 +319,10 @@ func (h *ProjectHandler) UpdateProject(c *gin.Context) {
 	project.BusinessModel = req.BusinessModel
 	project.Traction = req.Traction
 	project.Team = req.Team
+	// Note: UpdateProject doesn't currently support file uploads or new fields in this snippet
+	// Let's add the basic fields first. Ideally UpdateProject should also support Multipart.
+	// For now adding WebsiteURL to JSON update.
+	project.WebsiteURL = req.WebsiteURL
 	project.MinInvestment = req.MinInvestment
 	project.MaxInvestment = req.MaxInvestment
 	project.EquityOffered = req.EquityOffered
