@@ -427,24 +427,27 @@ document.getElementById('create-project-form')?.addEventListener('submit', async
     btn.textContent = 'Submitting...';
 
     try {
-        'Authorization': `Bearer ${token}`
-        // Let browser set Content-Type for multipart
-    },
-    body: formData
-});
+        const token = localStorage.getItem('token');
+        const res = await fetch(API_BASE + '/projects', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
 
-const json = await res.json();
-if (!res.ok) throw new Error(json.error || 'Submission failed');
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Submission failed');
 
-showToast('Project created successfully!', 'success');
-e.target.reset();
-window.location.hash = 'developer'; // Go to dashboard
+        showToast('Project created successfully!', 'success');
+        e.target.reset();
+        window.location.hash = 'developer'; // Go to dashboard
     } catch (err) {
-    showToast(err.message, 'error');
-} finally {
-    btn.disabled = false;
-    btn.textContent = 'Submit Project';
-}
+        showToast(err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Project';
+    }
 });
 
 // Admin Dashboard Logic
