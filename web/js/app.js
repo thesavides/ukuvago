@@ -634,7 +634,8 @@ document.getElementById('category-form')?.addEventListener('submit', async (e) =
             showToast('Category created', 'success');
         }
         closeCategoryModal();
-        loadAdminCategories();
+        // Force reload and wait for it
+        await loadAdminCategories();
     } catch (err) {
         showToast(err.message, 'error');
     }
