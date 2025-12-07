@@ -176,8 +176,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         else window.location.hash = 'developer';
     };
     pages['create-project'] = () => {
-        if (!currentUser || currentUser.role !== 'developer') { showPage('login'); return; }
+        if (!currentUser || (currentUser.role !== 'developer' && currentUser.role !== 'admin')) { showPage('login'); return; }
         loadCreateProject();
+    };
+    pages['change-password'] = () => {
+        if (!currentUser) { showPage('login'); return; }
+        // Pre-fill if needed, mostly just show the form
     };
     pages.developer = () => {
         if (!currentUser || currentUser.role !== 'developer') { showPage('login'); return; }
@@ -238,6 +242,28 @@ document.getElementById('register-form')?.addEventListener('submit', async (e) =
         showToast('Registration successful!', 'success');
         showPage(currentUser.role + '-dashboard');
         updateNav();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+});
+
+document.getElementById('change-password-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const currentPassword = form.current_password.value;
+    const newPassword = form.new_password.value;
+    const confirmPassword = form.confirm_password.value;
+
+    if (newPassword !== confirmPassword) {
+        showToast('New passwords do not match', 'error');
+        return;
+    }
+
+    try {
+        await api.put('/auth/password', { current_password: currentPassword, new_password: newPassword });
+        showToast('Password updated successfully', 'success');
+        form.reset();
+        history.back();
     } catch (err) {
         showToast(err.message, 'error');
     }
@@ -337,7 +363,9 @@ async function submitProjectForReview(id) {
     try {
         await api.post(`/projects/${id}/submit`);
         showToast('Project submitted for review', 'success');
-        loadDeveloperDashboard();
+        // Refresh dashboard based on role
+        if (currentUser.role === 'admin') loadAdminDashboard();
+        else loadDeveloperDashboard();
     } catch (err) {
         showToast(err.message, 'error');
     }
