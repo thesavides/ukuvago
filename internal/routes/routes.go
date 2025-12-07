@@ -87,7 +87,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			{
 				authProtected.GET("/me", authHandler.GetCurrentUser)
 				authProtected.PUT("/profile", authHandler.UpdateProfile)
-				authProtected.POST("/change-password", authHandler.ChangePassword)
+				authProtected.PUT("/password", authHandler.ChangePassword)
 			}
 		}
 
